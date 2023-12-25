@@ -1,41 +1,25 @@
-# ua.petafloppa.spdl (spdl)
+# SPDL
 
-SPDL
+To be able to interact with spotify API, you need to create an app in [Spotify dashboard](https://developer.spotify.com/dashboard/) (you don't need a premium account for this). You can call the app anything you want. <br/>
+Then go to app's settings, and do two things:
 
-## Install the dependencies
+1. Copy Client ID into spdl's settings
+2. Add two URLs to Redirect URIs
+   - For electron development server: http://localhost:9300/
+   - For electron build: file://
+
+## Install dependencies
+
 ```bash
-yarn
-# or
 npm install
 ```
 
-### Start the app in development mode (hot-code reloading, error reporting, etc.)
+## Run a development instance
+
 ```bash
-quasar dev
+quasar dev -m electron
 ```
 
+## Build
 
-### Lint the files
-```bash
-yarn lint
-# or
-npm run lint
-```
-
-
-### Format the files
-```bash
-yarn format
-# or
-npm run format
-```
-
-
-
-### Build the app for production
-```bash
-quasar build
-```
-
-### Customize the configuration
-See [Configuring quasar.config.js](https://v2.quasar.dev/quasar-cli-vite/quasar-config-js).
+_TODO_
