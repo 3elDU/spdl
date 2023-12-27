@@ -35,9 +35,8 @@ async function downloadYTDLP() {
 }
 
 // Sanitizes part of the path, e.g. album name, or the author name.
-// Replaces double dots (..) and slashes with underscores
 function sanitizePath(path: string): string {
-  return path.replaceAll('/', '_').replaceAll('\\', '_').replaceAll('..', '_');
+  return path.replace(/[/\\:?*<>|'"]+/g, '_').replace(/\.+$/, ''); // replace dots at the end
 }
 
 export function calculateTrackPath(track: TrackDownloadRequest): string {
@@ -49,39 +48,28 @@ export function calculateTrackPath(track: TrackDownloadRequest): string {
   );
 }
 
-let tracksDownloading = 0;
-
 // Downloads the track from YouTube, and embeds metadata in it automatically
-export async function downloadTrack(track: TrackDownloadRequest) {
+export async function downloadTrack(
+  track: TrackDownloadRequest
+): Promise<void> {
   await downloadYTDLP();
   if (ffmpegPath === null) {
-    return;
+    throw new Error('no ffmpeg!');
   }
+
+  queue.updateItem(track.id, {
+    status: 'downloading',
+    progress: 0,
+  });
 
   const fullPath = calculateTrackPath(track);
   const trackPath = dirname(fullPath);
   const trackFilename = basename(fullPath);
 
-  queue.addItem({
-    status: 'pending',
-    track: track.track,
-    id: track.id,
-    progress: 0,
-  });
-  tracksDownloading++;
-  console.log('downloading: ', tracksDownloading);
-
   // Create parent directories for the track first
-  const directoryCreated = await mkdir(dirname(fullPath), {
+  await mkdir(dirname(fullPath), {
     recursive: true,
   });
-  console.log(
-    track,
-    fullPath,
-    directoryCreated,
-    dirname(fullPath),
-    basename(fullPath)
-  );
 
   const youtubeSearchQuery = `${track.metadata.artist_names.join(' ')} ${
     track.name
@@ -91,66 +79,65 @@ export async function downloadTrack(track: TrackDownloadRequest) {
   );
 
   queue.updateItem(track.id, {
-    status: 'pending',
+    status: 'downloading',
     progress: 10,
   });
 
   const closestMatch = findClosestMatch(result.entries, track.duration);
-  console.log(
-    result.entries.map((result) => [result.title, result.id, result.duration]),
-    [closestMatch.title, closestMatch.id, closestMatch.duration]
-  );
+  return new Promise<void>((resolve, reject) => {
+    ytDlp
+      .exec([
+        '-x',
+        '--ffmpeg-location',
+        ffmpegPath as string,
+        '--audio-format',
+        'mp3',
+        '-f',
+        'ba',
+        '-P',
+        trackPath,
+        '-o',
+        trackFilename,
+        '--',
+        closestMatch.id,
+      ])
+      .on('progress', (progress) => {
+        queue.updateItem(track.id, {
+          status: 'downloading',
+          progress: 10 + (progress.percent ?? 0) * 0.8,
+        });
+      })
+      .on('close', async () => {
+        await embedMetadata(fullPath, track);
+        queue.updateItem(track.id, {
+          status: 'success',
+          path: fullPath,
+          tooltip: `Search query - '${youtubeSearchQuery}'`,
+        });
 
-  ytDlp
-    .exec([
-      '-x',
-      '--ffmpeg-location',
-      ffmpegPath,
-      '--audio-format',
-      'mp3',
-      '-f',
-      'ba',
-      '-P',
-      trackPath,
-      '-o',
-      trackFilename,
-      '--',
-      closestMatch.id,
-    ])
-    .on('progress', (progress) => {
-      queue.updateItem(track.id, {
-        status: 'pending',
-        progress: 10 + (progress.percent ?? 0) * 0.8,
-      });
-    })
-    .on('close', async () => {
-      await embedMetadata(fullPath, track);
-      queue.updateItem(track.id, {
-        status: 'success',
-        path: fullPath,
-        tooltip: `Search query - '${youtubeSearchQuery}'`,
-      });
+        // Remove item from a queue after 30 seconds
+        setTimeout(() => {
+          queue.deleteItem(track.id);
+        }, 30_000);
 
-      tracksDownloading--;
+        resolve();
+      })
+      .on('error', async (error) => {
+        queue.updateItem(track.id, {
+          status: 'error',
+          error: error,
+        });
 
-      // Remove item from a queue after 30 seconds
-      setTimeout(() => {
-        queue.deleteItem(track.id);
-      }, 30_000);
-    })
-    .on('error', async (error) => {
-      queue.updateItem(track.id, {
-        status: 'error',
-        error: error,
+        reject(error);
       });
-    });
+  });
 }
 
 // Embeds ID3 metadata into existing .mp3 file
 async function embedMetadata(path: string, track: TrackDownloadRequest) {
   const metadata = track.metadata;
   const buffer = await readFile(path);
-  const mp3tag = new MP3Tag(buffer, true);
+  const mp3tag = new MP3Tag(buffer);
 
   mp3tag.read();
 
@@ -191,10 +178,8 @@ async function embedMetadata(path: string, track: TrackDownloadRequest) {
   }
 
   mp3tag.read();
-  console.log(mp3tag.tags);
 
   await writeFile(path, Buffer.from(mp3tag.buffer));
-  console.log('wrote metadata');
 }
 
 // Find the closest matching video by length

@@ -9,6 +9,7 @@ import { toRaw } from 'vue';
 import { usePreferencesStore } from './stores/preferences';
 import { useSpotifyAPIStore } from './stores/spotify';
 import { useQueueStore } from './stores/queue';
+import { setupSyncJob } from './sync/sync';
 import { Notify } from 'quasar';
 
 const queue = useQueueStore();
@@ -87,4 +88,6 @@ window.ipc.getQueueItems().then((items) => {
 window.ipc.onQueueUpdate((items) => {
   queue.items = items;
 });
+
+setupSyncJob();
 </script>

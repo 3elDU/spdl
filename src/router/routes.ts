@@ -28,18 +28,17 @@ const routes: RouteRecordRaw[] = [
         }),
       },
       {
+        path: 'library',
+        name: 'library',
+        component: () => import('pages/LibraryPage.vue'),
+        meta: { title: 'Library ' },
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('pages/PreferencesPage.vue'),
         meta: { title: 'Preferences ' },
       },
-      /*
-      {
-        path: 'info',
-        component: () => import('pages/InfoPage.vue'),
-        meta: { title: 'Info' },
-      },
-      */
     ],
   },
 

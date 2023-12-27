@@ -73,6 +73,7 @@ const { authenticated } = storeToRefs(useSpotifyAPIStore());
 const items = computed(() => [
   { type: 'item', icon: 'home', label: 'Home', to: '/' },
   { type: 'item', icon: 'search', label: 'Search', to: '/search' },
+  { type: 'item', icon: 'library_music', label: 'Library', to: '/library' },
   { type: 'separator' },
   {
     type: 'item',
@@ -82,6 +83,5 @@ const items = computed(() => [
     class: authenticated.value ? '' : 'text-negative',
   },
   { type: 'item', icon: 'settings', label: 'Settings', to: '/settings' },
-  // { type: 'item', icon: 'info', label: 'App info', to: '/info' }
 ]);
 </script>

@@ -1,8 +1,9 @@
 import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
-import { calculateTrackPath, downloadTrack } from './download/downloader';
+import { calculateTrackPath } from './download/downloader';
 import { preferences, UserPreferences } from './store';
 import { existsSync } from 'fs';
 import { queue } from './download/queue';
+import { downloadTrackQueued } from './download/worker';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -50,7 +51,7 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   });
 
   ipcMain.on('spotify:downloadTrack', (_event, track: TrackDownloadRequest) => {
-    downloadTrack(track);
+    downloadTrackQueued(track);
   });
   ipcMain.handle(
     'spotify:trackExistsOnDisk',

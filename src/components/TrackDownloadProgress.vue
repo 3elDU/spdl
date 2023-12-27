@@ -1,10 +1,19 @@
 <template>
-  <q-circular-progress
+  <q-icon
     v-if="queueItem?.status === 'pending'"
+    class="tw-p-[5px]"
+    name="pending"
+    size="sm"
+    color="grey"
+    title="Pending"
+  />
+  <q-circular-progress
+    v-else-if="queueItem?.status === 'downloading'"
     :value="queueItem.progress"
     class="tw-m-[5px]"
     size="sm"
     track-color="grey-3"
+    :title="queueItem.progress.toString() + '%'"
   />
   <q-icon
     v-else-if="queueItem?.status === 'error'"

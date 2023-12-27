@@ -24,7 +24,14 @@ export const useSpotifyAPIStore = defineStore('spotify', {
       api: SpotifyApi.withUserAuthorization(
         clientID ?? '',
         calculateRedirectURL(),
-        ['user-read-private'],
+        [
+          'user-read-private',
+          'user-library-read',
+          'playlist-read-private',
+          'playlist-read-collaborative',
+          'playlist-modify-private',
+          'playlist-modify-public',
+        ],
         { redirectionStrategy }
       ),
     };

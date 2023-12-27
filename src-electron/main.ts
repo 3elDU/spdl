@@ -4,6 +4,7 @@ import os from 'os';
 import registerIPCHandlers from './ipc';
 import { preferences } from './store';
 import { queue } from './download/queue';
+import { initQueueWorker } from './download/worker';
 
 // needed in case process is undefined under Linux
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -66,6 +67,7 @@ function handleWindowEvents() {
 
 function init() {
   createWindow();
+  initQueueWorker();
   if (mainWindow !== undefined) {
     registerIPCHandlers(mainWindow);
     handleWindowEvents();
