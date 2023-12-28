@@ -18,9 +18,13 @@ function createWindow() {
    */
   mainWindow = new BrowserWindow({
     icon: path.resolve(__dirname, 'icons/icon.png'), // tray icon
+
     width: 1280,
     height: 720,
+    minWidth: 640,
+    minHeight: 480,
     useContentSize: true,
+
     autoHideMenuBar: true,
     // Initially the window is hidden. Show it only when the content is loaded and rendered
     show: false,

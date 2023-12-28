@@ -14,7 +14,7 @@
       <q-card-section horizontal>
         <q-skeleton
           size="128px"
-          class="tw-aspect-square"
+          class="tw-w-32 tw-h-32 tw-aspect-square"
           square
           type="QAvatar"
         />
@@ -66,7 +66,7 @@
             flat
             round
             aria-label="Sync liked tracks"
-            @click="syncLikedTracks"
+            @click="turnOnLikedTracksSync"
           >
             <q-icon name="sync_disabled" />
           </q-btn>
@@ -156,7 +156,7 @@ import { SimplifiedPlaylist } from '@spotify/web-api-ts-sdk';
 import { storeToRefs } from 'pinia';
 import { usePreferencesStore } from 'src/stores/preferences';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
-import { sync } from 'src/sync/sync';
+import { syncPlaylist, syncLikedTracks } from 'src/sync/sync';
 import { ref, Ref } from 'vue';
 
 const spotify = useSpotifyAPIStore();
@@ -180,12 +180,13 @@ load();
 function addToSyncedPlaylists(playlist: SimplifiedPlaylist) {
   preferences.value.syncedPlaylists.push({
     id: playlist.id,
-    name: playlist.name ?? undefined,
-    description: playlist.description ?? undefined,
+    name: playlist.name,
+    description: playlist.description,
+    cover: playlist.images.at(0)?.url,
     tracksCount: playlist.tracks?.total ?? 0,
     lastSynced: 0,
   });
-  sync();
+  syncPlaylist(playlist.id);
 }
 
 function removeFromSyncedPlaylists(playlist: SimplifiedPlaylist) {
@@ -197,13 +198,13 @@ function removeFromSyncedPlaylists(playlist: SimplifiedPlaylist) {
   }
 }
 
-function syncLikedTracks() {
+function turnOnLikedTracksSync() {
   preferences.value.syncedLikedTracks = {
     synced: true,
     lastSynced: 0,
     tracksCount: likedTracksCount.value,
   };
-  sync();
+  syncLikedTracks();
 }
 
 function unsyncLikedTracks() {

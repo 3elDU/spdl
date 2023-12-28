@@ -29,3 +29,7 @@ export function formatTrackAuthors(track: Track): string {
   const artistNames = track.artists.map((artist) => artist.name);
   return artistNames.join(', ');
 }
+
+export function formatDateTime(date: Date): string {
+  return date.toLocaleString(navigator.language);
+}

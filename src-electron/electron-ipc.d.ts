@@ -1,5 +1,6 @@
 import { Track } from '@spotify/web-api-ts-sdk';
 import { UserPreferences } from './store';
+import { LibraryStats } from './stat/stat';
 
 interface ElectronIPC {
   minimize(): void;
@@ -14,11 +15,13 @@ interface ElectronIPC {
   chooseMusicDirectory(): Promise<string | undefined>;
   openMusicDirectory(): void;
 
-  downloadTrack(track: Track): void;
+  downloadTrack(track: Track, queued: boolean): void;
   trackExistsOnDisk(track: Track): Promise<boolean>;
 
   getQueueItems(): Promise<QueueItem[]>;
   onQueueUpdate(callback: (queue: QueueItem[]) => void): void;
+
+  statLibrary(): Promise<LibraryStats>;
 }
 
 declare global {

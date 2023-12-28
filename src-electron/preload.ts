@@ -25,21 +25,24 @@ contextBridge.exposeInMainWorld('ipc', {
     ipcRenderer.invoke('preferences:chooseMusicDirectory'),
   openMusicDirectory: () => ipcRenderer.send('preferences:openMusicDirectory'),
 
-  downloadTrack: (track: Track) => {
-    ipcRenderer.send('spotify:downloadTrack', {
-      track: track,
-      name: track.name,
-      id: track.id,
-      duration: track.duration_ms / 1000,
-      metadata: {
-        album_cover_url: track.album.images[0].url,
-        track_title: track.name,
-        album_name: track.album.name,
-        artist_names: track.artists.map((artist) => artist.name),
-        release_year: new Date(track.album.release_date).getFullYear(),
-        track_number: track.track_number,
-      },
-    } as TrackDownloadRequest);
+  downloadTrack: (track: Track, queued: boolean) => {
+    ipcRenderer.send(
+      queued ? 'spotify:downloadTrackQueued' : 'spotify:downloadTrack',
+      {
+        track: track,
+        name: track.name,
+        id: track.id,
+        duration: track.duration_ms / 1000,
+        metadata: {
+          album_cover_url: track.album.images[0].url,
+          track_title: track.name,
+          album_name: track.album.name,
+          artist_names: track.artists.map((artist) => artist.name),
+          release_year: new Date(track.album.release_date).getFullYear(),
+          track_number: track.track_number,
+        },
+      } as TrackDownloadRequest
+    );
   },
   trackExistsOnDisk: (track: Track): Promise<boolean> => {
     return ipcRenderer.invoke('spotify:trackExistsOnDisk', {
@@ -62,4 +65,6 @@ contextBridge.exposeInMainWorld('ipc', {
       callback(queue);
     });
   },
+
+  statLibrary: () => ipcRenderer.invoke('library:stat'),
 });

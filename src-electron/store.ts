@@ -5,8 +5,8 @@ import { join } from 'path';
 
 export interface SyncedPlaylist {
   id: string;
-  name?: string;
-  description?: string;
+  name: string;
+  description: string;
   cover?: string;
   // UNIX date
   lastSynced: number;
@@ -91,7 +91,13 @@ export const preferences = new Store({
                 description: 'Amount of tracks in the playlist',
               },
             },
-            required: ['id', 'lastSynced', 'tracksCount'],
+            required: [
+              'id',
+              'name',
+              'description',
+              'lastSynced',
+              'tracksCount',
+            ],
             additionalProperties: false,
           },
         },

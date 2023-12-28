@@ -15,9 +15,23 @@
       </q-td>
     </template>
     <template v-slot:body-cell-progress="props">
-      <q-td :props="props">
+      <q-td
+        :props="props"
+        @mouseenter="showDownloadNowButton = true"
+        @mouseleave="showDownloadNowButton = false"
+      >
         <div class="tw-inline-flex tw-gap-2 items-center">
           <TrackDownloadProgress :track="props.row" />
+          <q-btn
+            v-if="showDownloadNowButton && props.row.status === 'pending'"
+            dense
+            flat
+            round
+            color="primary"
+            icon="download"
+            title="Download now"
+            @click="downloadNow(props.row)"
+          />
         </div>
       </q-td>
     </template>
@@ -35,7 +49,7 @@
     </template>
     <template v-slot:no-data>
       <div class="tw-flex tw-flex-row tw-items-center tw-gap-2">
-        <q-icon name="o_info" size="sm" />
+        <q-icon name="o_info" size="sm" color="grey" />
         No tracks are currently downloading
       </div>
     </template>
@@ -46,9 +60,14 @@
 import { QTableColumn } from 'quasar';
 import TrackDownloadProgress from './TrackDownloadProgress.vue';
 import { useQueueStore } from 'src/stores/queue';
-import { ref } from 'vue';
+import { ref, toRaw } from 'vue';
 import { formatTrackAuthors, formatTrackDuration } from 'src/util/util';
 import { storeToRefs } from 'pinia';
+
+const showDownloadNowButton = ref(false);
+function downloadNow(queueItem: QueueItem) {
+  window.ipc.downloadTrack(toRaw(queueItem.track), false);
+}
 
 const filter = ref('');
 const columns: QTableColumn[] = [
