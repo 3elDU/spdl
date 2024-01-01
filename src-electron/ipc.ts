@@ -1,4 +1,4 @@
-import { BrowserWindow, dialog, ipcMain, shell } from 'electron';
+import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
 import { calculateTrackPath, downloadTrack } from './download/downloader';
 import { preferences, UserPreferences } from './store';
 import { existsSync } from 'fs';
@@ -19,6 +19,11 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   });
   ipcMain.on('window-close', () => {
     window.close();
+  });
+
+  ipcMain.on('relaunch', () => {
+    app.relaunch();
+    app.exit();
   });
 
   ipcMain.handle('preferences:get', () => {

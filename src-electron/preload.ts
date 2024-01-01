@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('ipc', {
   maximize: () => ipcRenderer.send('window-maximize'),
   close: () => ipcRenderer.send('window-close'),
 
+  relaunch: () => ipcRenderer.send('relaunch'),
+
   getPreferences: () => ipcRenderer.invoke('preferences:get'),
   updatePreferences: (newPreferences: UserPreferences) => {
     ipcRenderer.send('preferences:update', newPreferences);

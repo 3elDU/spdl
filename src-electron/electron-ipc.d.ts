@@ -7,6 +7,8 @@ interface ElectronIPC {
   maximize(): void;
   close(): void;
 
+  relaunch(): void;
+
   getPreferences(): Promise<UserPreferences>;
   updatePreferences(newPreferences: UserPreferences): void;
   onPreferencesUpdate(

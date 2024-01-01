@@ -9,11 +9,11 @@
         :model-value="preferences.preferences.musicDirectory"
         @update:model-value="
           (value) => {
+            preferences.changeMusicFolder(value);
             Notify.create({
               type: 'positive',
               message: 'Preferences saved',
             });
-            preferences.changeMusicFolder(value);
           }
         "
       >
@@ -55,15 +55,35 @@
         @click="openMusicDirectory"
       />
     </div>
+
+    <div class="tw-flex tw-gap-4 tw-items-center">
+      <q-input
+        outlined
+        class="tw-max-w-xs tw-grow"
+        type="number"
+        :rules="[
+          (val) =>
+            Number.parseInt(val) >= 1 ||
+            'Number of threads must be greater or equal than 1',
+        ]"
+        label="N of threads for parallel downloading"
+        v-model.number="parallelDownloadingLimit"
+      />
+
+      <q-btn color="primary" label="Set" @click="setParallelDownloadingLimit" />
+    </div>
   </q-page>
 </template>
 
 <script setup lang="ts">
 import { Notify } from 'quasar';
 import { usePreferencesStore } from 'src/stores/preferences';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 
 const preferences = usePreferencesStore();
+const parallelDownloadingLimit = ref(
+  preferences.preferences.parallelDownloadingLimit
+);
 
 const availableMusicDirectories = computed(() =>
   [preferences.preferences.musicDirectory].concat(
@@ -79,6 +99,18 @@ async function chooseMusicFolder() {
       type: 'positive',
       message: 'Preferences saved',
     });
+  }
+}
+
+function setParallelDownloadingLimit() {
+  if (
+    typeof parallelDownloadingLimit.value === 'number' &&
+    !Number.isNaN(parallelDownloadingLimit.value)
+  ) {
+    console.log('setting', parallelDownloadingLimit.value);
+    preferences.preferences.parallelDownloadingLimit =
+      parallelDownloadingLimit.value;
+    window.ipc.relaunch();
   }
 }
 
