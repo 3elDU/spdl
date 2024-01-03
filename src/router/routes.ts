@@ -24,7 +24,7 @@ const routes: RouteRecordRaw[] = [
         props: (route) => ({
           query: route.query?.query,
           // Convert string back to boolean
-          searchLocal: route.query?.searchLocal === 'true',
+          performLocalSearch: route.query?.performLocalSearch === 'true',
         }),
       },
       {

@@ -60,7 +60,7 @@ const { track, showDownloadButton } = defineProps<{
 
 const downloading = ref(false);
 function download() {
-  window.ipc.downloadTrack(toRaw(track));
+  window.ipc.downloadTrack(toRaw(track), true);
   downloading.value = true;
 }
 

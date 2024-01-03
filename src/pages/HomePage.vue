@@ -82,7 +82,7 @@
                   class="text-h6 tw-font-normal tw-truncate"
                   :title="playlist.name"
                 >
-                  {{ playlist.name }}
+                  {{ playlist.name.length > 0 ? playlist.name : 'No name' }}
                 </div>
                 <div class="text-caption text-grey">
                   {{ playlist.tracksCount }} tracks
@@ -168,7 +168,7 @@ function search(query: string, searchLocal: boolean) {
     name: 'search',
     query: {
       query: query,
-      searchLocal: searchLocal.toString(),
+      performLocalSearch: searchLocal.toString(),
     },
   });
 }

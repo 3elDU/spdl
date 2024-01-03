@@ -33,3 +33,16 @@ export function formatTrackAuthors(track: Track): string {
 export function formatDateTime(date: Date): string {
   return date.toLocaleString(navigator.language);
 }
+
+export function spotifyTrackToSearchResult(track: Track): TrackSearchResult {
+  return {
+    album_cover_image: track.album.images[0].url,
+    track_title: track.name,
+    album_name: track.album.name,
+    artist_names: track.artists.map((artist) => artist.name),
+    release_year: new Date(track.album.release_date).getFullYear(),
+    track_number: track.track_number,
+    duration_ms: track.duration_ms,
+    track,
+  };
+}

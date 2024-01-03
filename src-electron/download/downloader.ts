@@ -39,12 +39,17 @@ function sanitizePath(path: string): string {
   return path.replace(/[/\\:?*<>|'"]+/g, '_').replace(/\.+$/, ''); // replace dots at the end
 }
 
-export function calculateTrackPath(track: TrackDownloadRequest): string {
+export function calculateTrackPath(
+  name: string,
+  id: string,
+  album_name: string,
+  artist_names: string[]
+): string {
   return join(
     preferences.get('preferences.musicDirectory'),
-    sanitizePath(track.metadata.artist_names[0]),
-    sanitizePath(track.metadata.album_name),
-    sanitizePath(`${track.name}_${track.id}.mp3`)
+    sanitizePath(artist_names[0]),
+    sanitizePath(album_name),
+    sanitizePath(`${name}_${id}.mp3`)
   );
 }
 
@@ -62,7 +67,12 @@ export async function downloadTrack(
     progress: 0,
   });
 
-  const fullPath = calculateTrackPath(track);
+  const fullPath = calculateTrackPath(
+    track.name,
+    track.id,
+    track.metadata.album_name,
+    track.metadata.artist_names
+  );
   const trackPath = dirname(fullPath);
   const trackFilename = basename(fullPath);
 

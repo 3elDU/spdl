@@ -5,6 +5,7 @@ import { existsSync } from 'fs';
 import { queue } from './download/queue';
 import { downloadTrackQueued } from './download/worker';
 import { statLibrary } from './stat/stat';
+import localSearch from './search';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -68,7 +69,12 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.handle(
     'spotify:trackExistsOnDisk',
     async (_event, track: TrackDownloadRequest) => {
-      const path = calculateTrackPath(track);
+      const path = calculateTrackPath(
+        track.name,
+        track.id,
+        track.metadata.album_name,
+        track.metadata.artist_names
+      );
       return existsSync(path);
     }
   );
@@ -76,4 +82,8 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.handle('library:stat', async () => {
     return await statLibrary(preferences.get('preferences.musicDirectory'));
   });
+  ipcMain.handle(
+    'library:searchLocal',
+    async (_event, query: string) => await localSearch(query)
+  );
 }

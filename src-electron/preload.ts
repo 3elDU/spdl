@@ -69,4 +69,6 @@ contextBridge.exposeInMainWorld('ipc', {
   },
 
   statLibrary: () => ipcRenderer.invoke('library:stat'),
+  searchLocal: (query: string) =>
+    ipcRenderer.invoke('library:searchLocal', query),
 });

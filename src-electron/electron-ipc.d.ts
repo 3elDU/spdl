@@ -24,6 +24,7 @@ interface ElectronIPC {
   onQueueUpdate(callback: (queue: QueueItem[]) => void): void;
 
   statLibrary(): Promise<LibraryStats>;
+  searchLocal(query: string): Promise<TrackSearchResult[]>;
 }
 
 declare global {
