@@ -16,10 +16,7 @@
     >
       <template v-slot:body-cell-albumURL="props">
         <q-td :props="props">
-          <q-avatar size="64px" rounded class="tw-absolute">
-            <img v-if="typeof props.value === 'string'" :src="props.value" />
-            <img v-else :src="bufferToImage(props.value)" />
-          </q-avatar>
+          <TrackAlbumCover size="64px" :track="props.row" show-play-button />
         </q-td>
       </template>
       <template v-slot:body-cell-trackDisplayName="props">
@@ -28,7 +25,7 @@
             <q-item-section>
               <q-item-label>{{ props.value }}</q-item-label>
               <q-item-label caption>
-                {{ props.row.artist_names.join(', ') }}
+                {{ joinArtistNames(props.row.artists, ', ') }}
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -38,10 +35,7 @@
         <q-td v-if="!searchedLocal" :props="props">
           <div class="tw-inline-flex tw-items-center tw-gap-2">
             {{ formatTrackDuration(props.value) }}
-            <TrackDownloadProgress
-              :track="props.row.track"
-              show-download-button
-            />
+            <TrackDownloadProgress :track="props.row" show-download-button />
           </div>
         </q-td>
       </template>
@@ -53,19 +47,21 @@
 import { QTableColumn } from 'quasar';
 import SearchComponent from 'src/components/SearchComponent.vue';
 import TrackDownloadProgress from 'src/components/TrackDownloadProgress.vue';
+import TrackAlbumCover from 'src/components/TrackAlbumCover.vue';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { formatTrackDuration } from 'src/util/util';
-import { spotifyTrackToSearchResult } from 'src/util/util';
-import { Ref, ref, toRaw } from 'vue';
-import { Buffer } from 'buffer';
+import { Ref, ref } from 'vue';
+import { SPDL } from 'app/types';
+import { fromSpotifyTrack } from 'app/types/convert';
+import { joinArtistNames } from 'app/types/util';
 
-const tracks: Ref<TrackSearchResult[]> = ref([]);
+const tracks: Ref<SPDL.Track[]> = ref([]);
 
 const columns: QTableColumn[] = [
   {
     name: 'albumURL',
     label: 'Album cover',
-    field: (row: TrackSearchResult) => row.album_cover_image,
+    field: (row: SPDL.Track) => row.album.cover_url,
     align: 'left',
     sortable: false,
     style: 'width: 64px',
@@ -74,22 +70,16 @@ const columns: QTableColumn[] = [
   {
     name: 'trackDisplayName',
     label: 'Track name',
-    field: (row: TrackSearchResult) => row.track_title,
+    field: (row: SPDL.Track) => row.name,
     align: 'left',
   },
   {
     name: 'duration',
     label: 'Track duration',
-    field: (row: TrackSearchResult) => row.duration_ms,
+    field: (row: SPDL.Track) => row.duration,
     align: 'right',
   },
 ];
-
-// Converts a raw buffer into a base64-encoded image
-function bufferToImage(array: Uint8Array): string {
-  const base64 = Buffer.from(array).toString('base64');
-  return 'data:image/jpeg;base64,' + base64;
-}
 
 const spotify = useSpotifyAPIStore();
 
@@ -111,7 +101,6 @@ if (query !== '') {
   performSearch(query, performLocalSearch);
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function performSearch(query: string, searchLocal: boolean) {
   if (query === '') {
     return;
@@ -124,10 +113,7 @@ async function performSearch(query: string, searchLocal: boolean) {
     searchedLocal.value = true;
   } else {
     const res = await spotify.api.search(query, ['track']);
-    tracks.value = res.tracks.items.map((track) =>
-      spotifyTrackToSearchResult(track)
-    );
-    console.log(tracks.value);
+    tracks.value = res.tracks.items.map((track) => fromSpotifyTrack(track));
     searchedLocal.value = false;
   }
 

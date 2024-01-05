@@ -6,6 +6,8 @@ import { queue } from './download/queue';
 import { downloadTrackQueued } from './download/worker';
 import { statLibrary } from './stat/stat';
 import localSearch from './search';
+import { readFile } from 'fs/promises';
+import { SPDL } from 'app/types';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -57,30 +59,36 @@ export default function registerIPCHandlers(window: BrowserWindow) {
     return queue.getAllItems();
   });
 
-  ipcMain.on('spotify:downloadTrack', (_event, track: TrackDownloadRequest) => {
+  ipcMain.on('spotify:downloadTrack', (_event, track: SPDL.Track) => {
     downloadTrack(track);
   });
-  ipcMain.on(
-    'spotify:downloadTrackQueued',
-    (_event, track: TrackDownloadRequest) => {
-      downloadTrackQueued(track);
-    }
-  );
+  ipcMain.on('spotify:downloadTrackQueued', (_event, track: SPDL.Track) => {
+    downloadTrackQueued(track);
+  });
   ipcMain.handle(
     'spotify:trackExistsOnDisk',
-    async (_event, track: TrackDownloadRequest) => {
-      const path = calculateTrackPath(
-        track.name,
-        track.id,
-        track.metadata.album_name,
-        track.metadata.artist_names
-      );
-      return existsSync(path);
+    async (_event, track: SPDL.Track) => {
+      const path = calculateTrackPath(track);
+      if (existsSync(path)) {
+        return path;
+      } else {
+        return undefined;
+      }
     }
   );
 
   ipcMain.handle('library:stat', async () => {
     return await statLibrary(preferences.get('preferences.musicDirectory'));
+  });
+  ipcMain.handle('library:loadAudioFile', async (_event, track: SPDL.Track) => {
+    const path = calculateTrackPath(track);
+
+    if (existsSync(path)) {
+      const buf = await readFile(path);
+      return buf.toString('base64');
+    } else {
+      return undefined;
+    }
   });
   ipcMain.handle(
     'library:searchLocal',

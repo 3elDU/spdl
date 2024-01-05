@@ -7,6 +7,8 @@ import ffmpegPath from 'ffmpeg-static';
 import { preferences } from '../store';
 import { existsSync } from 'fs';
 import { queue } from './queue';
+import { joinArtistNames } from 'app/types/util';
+import { SPDL } from 'app/types';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -36,27 +38,23 @@ async function downloadYTDLP() {
 
 // Sanitizes part of the path, e.g. album name, or the author name.
 function sanitizePath(path: string): string {
-  return path.replace(/[/\\:?*<>|'"]+/g, '_').replace(/\.+$/, ''); // replace dots at the end
+  return path
+    .replace(/[/\\:?*<>|'"]+/g, '_')
+    .replace(/\.+$/, '') // replace dots at the end
+    .trim();
 }
 
-export function calculateTrackPath(
-  name: string,
-  id: string,
-  album_name: string,
-  artist_names: string[]
-): string {
+export function calculateTrackPath(track: SPDL.Track): string {
   return join(
     preferences.get('preferences.musicDirectory'),
-    sanitizePath(artist_names[0]),
-    sanitizePath(album_name),
-    sanitizePath(`${name}_${id}.mp3`)
+    sanitizePath(track.artists[0].name),
+    sanitizePath(track.album.name),
+    sanitizePath(`${track.name}_${track.id}.mp3`)
   );
 }
 
 // Downloads the track from YouTube, and embeds metadata in it automatically
-export async function downloadTrack(
-  track: TrackDownloadRequest
-): Promise<void> {
+export async function downloadTrack(track: SPDL.Track): Promise<void> {
   await downloadYTDLP();
   if (ffmpegPath === null) {
     throw new Error('no ffmpeg!');
@@ -67,12 +65,7 @@ export async function downloadTrack(
     progress: 0,
   });
 
-  const fullPath = calculateTrackPath(
-    track.name,
-    track.id,
-    track.metadata.album_name,
-    track.metadata.artist_names
-  );
+  const fullPath = calculateTrackPath(track);
   const trackPath = dirname(fullPath);
   const trackFilename = basename(fullPath);
 
@@ -81,7 +74,7 @@ export async function downloadTrack(
     recursive: true,
   });
 
-  const youtubeSearchQuery = `${track.metadata.artist_names.join(' ')} ${
+  const youtubeSearchQuery = `${joinArtistNames(track.artists, ' ')} ${
     track.name
   }`;
   const result: VideoSearchResults = JSON.parse(
@@ -144,38 +137,39 @@ export async function downloadTrack(
 }
 
 // Embeds ID3 metadata into existing .mp3 file
-async function embedMetadata(path: string, track: TrackDownloadRequest) {
-  const metadata = track.metadata;
+async function embedMetadata(path: string, track: SPDL.Track) {
   const buffer = await readFile(path);
   const mp3tag = new MP3Tag(buffer);
 
   mp3tag.read();
 
-  mp3tag.tags.title = metadata.track_title;
-  mp3tag.tags.artist = metadata.artist_names.join(', ');
-  mp3tag.tags.year = metadata.release_year.toString();
-  mp3tag.tags.album = metadata.album_name;
-  mp3tag.tags.track = metadata.track_number.toString();
+  mp3tag.tags.title = track.name;
+  mp3tag.tags.artist = joinArtistNames(track.artists, ', ');
+  mp3tag.tags.year = track.album.release_year.toString();
+  mp3tag.tags.album = track.album.name;
+  mp3tag.tags.track = track.track_number.toString();
 
-  // Fetch album cover
-  const response = await fetch(metadata.album_cover_url);
-  const albumCoverBuffer = await response.arrayBuffer();
-  const albumCoverData = Array.from(new Uint8Array(albumCoverBuffer));
+  if (track.album.cover_url) {
+    // Fetch album cover
+    const response = await fetch(track.album.cover_url);
+    const albumCoverBuffer = await response.arrayBuffer();
+    const albumCoverData = Array.from(new Uint8Array(albumCoverBuffer));
 
-  if (mp3tag.tags.v2) {
-    // @ts-expect-error Typings in the mp3tag.js library itself are messed up
-    // https://mp3tag.js.org/docs/frames.html#v2-apic
-    // In the documentation they say APIC must be an array with objects,
-    // but in the typings it is a single object
-    // Documentation is, in fact, right, and typings are wrong.
-    mp3tag.tags.v2['APIC'] = [
-      {
-        type: 3,
-        format: 'image/jpeg',
-        description: 'Cover',
-        data: albumCoverData,
-      },
-    ];
+    if (mp3tag.tags.v2) {
+      // @ts-expect-error Typings in the mp3tag.js library itself are messed up
+      // https://mp3tag.js.org/docs/frames.html#v2-apic
+      // In the documentation they say APIC must be an array with objects,
+      // but in the typings it is a single object
+      // Documentation is, in fact, right, and typings are wrong.
+      mp3tag.tags.v2['APIC'] = [
+        {
+          type: 3,
+          format: 'image/jpeg',
+          description: 'Cover',
+          data: albumCoverData,
+        },
+      ];
+    }
   }
 
   mp3tag.save();

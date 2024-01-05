@@ -1,18 +1,18 @@
+import { SPDL } from 'app/types';
 import { preferences } from '../store';
 import { downloadTrack } from './downloader';
 import { queue } from './queue';
 
 let tracksDownloading = 0;
 
-export function downloadTrackQueued(request: TrackDownloadRequest) {
+export function downloadTrackQueued(track: SPDL.Track) {
   if (
-    queue.getAllItems().find((value) => value.id === request.id) === undefined
+    queue.getAllItems().find((value) => value.id === track.id) === undefined
   ) {
     queue.addItem({
       status: 'pending',
-      id: request.id,
-      request: request,
-      track: request.track,
+      id: track.id,
+      track: track,
     });
   }
 }
@@ -22,27 +22,25 @@ async function tick() {
     tracksDownloading <
     preferences.get('preferences.parallelDownloadingLimit', 2)
   ) {
-    const request = queue
+    const item = queue
       .getAllItems()
       .filter((item) => item.status === 'pending')
-      .at(0) as (QueueItemPending & BaseQueueItem) | undefined;
+      .at(0) as (SPDL.Queue.ItemPending & SPDL.Queue.BaseItem) | undefined;
 
-    if (request) {
+    if (item) {
       tracksDownloading++;
-      console.log(
-        `${tracksDownloading}| downloading track ${request.track.name}`
-      );
-      downloadTrack(request.request)
+      console.log(`${tracksDownloading}| downloading track ${item.track.name}`);
+      downloadTrack(item.track)
         .then(() => {
           console.log(
-            `${tracksDownloading}| downloaded track ${request.track.name}`
+            `${tracksDownloading}| downloaded track ${item.track.name}`
           );
         })
         .catch((error) => {
           console.log(
-            `${tracksDownloading}| error | ${request.track.name} | ${error}`
+            `${tracksDownloading}| error | ${item.track.name} | ${error}`
           );
-          queue.updateItem(request.id, {
+          queue.updateItem(item.id, {
             status: 'error',
             error: error,
           });

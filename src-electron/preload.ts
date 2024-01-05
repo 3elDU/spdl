@@ -1,6 +1,6 @@
-import { Track } from '@spotify/web-api-ts-sdk';
 import { contextBridge, ipcRenderer } from 'electron';
 import { UserPreferences } from './store';
+import { SPDL } from 'app/types';
 
 contextBridge.exposeInMainWorld('ipc', {
   minimize: () => ipcRenderer.send('window-minimize'),
@@ -27,43 +27,21 @@ contextBridge.exposeInMainWorld('ipc', {
     ipcRenderer.invoke('preferences:chooseMusicDirectory'),
   openMusicDirectory: () => ipcRenderer.send('preferences:openMusicDirectory'),
 
-  downloadTrack: (track: Track, queued: boolean) => {
+  downloadTrack: (track: SPDL.Track, queued: boolean) => {
     ipcRenderer.send(
       queued ? 'spotify:downloadTrackQueued' : 'spotify:downloadTrack',
-      {
-        track: track,
-        name: track.name,
-        id: track.id,
-        duration: track.duration_ms / 1000,
-        metadata: {
-          album_cover_url: track.album.images[0].url,
-          track_title: track.name,
-          album_name: track.album.name,
-          artist_names: track.artists.map((artist) => artist.name),
-          release_year: new Date(track.album.release_date).getFullYear(),
-          track_number: track.track_number,
-        },
-      } as TrackDownloadRequest
+      track
     );
   },
-  trackExistsOnDisk: (track: Track): Promise<boolean> => {
-    return ipcRenderer.invoke('spotify:trackExistsOnDisk', {
-      // We don't specify all properties of TrackDownloadRequest, since they aren't required
-      track: track,
-      name: track.name,
-      id: track.id,
-      metadata: {
-        album_name: track.album.name,
-        artist_names: track.artists.map((artist) => artist.name),
-      },
-    });
+  trackExistsOnDisk: (track: SPDL.Track): Promise<string | undefined> => {
+    return ipcRenderer.invoke('spotify:trackExistsOnDisk', track);
   },
 
-  getQueueItems: (): Promise<QueueItem[]> => {
+  getQueueItems: (): Promise<SPDL.Queue.Item[]> => {
     return ipcRenderer.invoke('queue:get');
   },
-  onQueueUpdate: (callback: (queue: QueueItem[]) => void) => {
-    ipcRenderer.on('queue:update', (_event, queue: QueueItem[]) => {
+  onQueueUpdate: (callback: (queue: SPDL.Queue.Item[]) => void) => {
+    ipcRenderer.on('queue:update', (_event, queue: SPDL.Queue.Item[]) => {
       callback(queue);
     });
   },
@@ -71,4 +49,6 @@ contextBridge.exposeInMainWorld('ipc', {
   statLibrary: () => ipcRenderer.invoke('library:stat'),
   searchLocal: (query: string) =>
     ipcRenderer.invoke('library:searchLocal', query),
+  loadAudioFile: (track: SPDL.Track): Promise<string | undefined> =>
+    ipcRenderer.invoke('library:loadAudioFile', track),
 });

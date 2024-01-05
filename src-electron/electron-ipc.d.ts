@@ -1,4 +1,3 @@
-import { Track } from '@spotify/web-api-ts-sdk';
 import { UserPreferences } from './store';
 import { LibraryStats } from './stat/stat';
 
@@ -17,14 +16,17 @@ interface ElectronIPC {
   chooseMusicDirectory(): Promise<string | undefined>;
   openMusicDirectory(): void;
 
-  downloadTrack(track: Track, queued: boolean): void;
-  trackExistsOnDisk(track: Track): Promise<boolean>;
+  downloadTrack(track: SPDL.Track, queued: boolean): void;
+  // Returns path to the audio file, if track exists on disk
+  trackExistsOnDisk(track: SPDL.Track): Promise<string | undefined>;
 
-  getQueueItems(): Promise<QueueItem[]>;
-  onQueueUpdate(callback: (queue: QueueItem[]) => void): void;
+  getQueueItems(): Promise<SPDL.Queue.Item[]>;
+  onQueueUpdate(callback: (queue: SPDL.Queue.Item[]) => void): void;
 
   statLibrary(): Promise<LibraryStats>;
-  searchLocal(query: string): Promise<TrackSearchResult[]>;
+  searchLocal(query: string): Promise<SPDL.Track[]>;
+  // Returns base64-encoded .mp3 file
+  loadAudioFile(track: SPDL.Track): Promise<string | undefined>;
 }
 
 declare global {

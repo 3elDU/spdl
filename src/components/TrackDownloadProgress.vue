@@ -49,12 +49,12 @@
 </template>
 
 <script setup lang="ts">
-import { Track } from '@spotify/web-api-ts-sdk';
+import { SPDL } from 'app/types';
 import { useQueueStore } from 'src/stores/queue';
 import { ComputedRef, Ref, computed, ref, toRaw, watch } from 'vue';
 
 const { track, showDownloadButton } = defineProps<{
-  track: Track;
+  track: SPDL.Track;
   showDownloadButton?: boolean;
 }>();
 
@@ -65,8 +65,11 @@ function download() {
 }
 
 const queue = useQueueStore();
-let queueItem: ComputedRef<QueueItem | undefined> | Ref<QueueItem | undefined> =
-  computed(() => queue.items.find((value) => value.id === track.id));
+let queueItem:
+  | ComputedRef<SPDL.Queue.Item | undefined>
+  | Ref<SPDL.Queue.Item | undefined> = computed(() =>
+  queue.items.find((value) => value.id === track.id)
+);
 
 watch(queueItem, (newQueueItem, oldQueueItem) => {
   // If the queue item became undefined (was removed from the queue),
@@ -76,7 +79,7 @@ watch(queueItem, (newQueueItem, oldQueueItem) => {
   }
 });
 
-const trackExistsOnDisk = ref(false);
+const trackExistsOnDisk: Ref<string | undefined> = ref(undefined);
 // Check if the track already exists in the queue
 if (queueItem.value !== undefined) {
   downloading.value = true;

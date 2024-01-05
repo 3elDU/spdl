@@ -1,28 +1,11 @@
 import { readFile, readdir, stat } from 'fs/promises';
 import MP3Tag from 'mp3tag.js';
-import { extname, join } from 'path';
+import { basename, extname, join } from 'path';
 import { preferences } from './store';
 import Fuse from 'fuse.js';
-import { Track } from '@spotify/web-api-ts-sdk';
+import { SPDL } from 'app/types';
 
-declare global {
-  interface TrackSearchResult {
-    // File location, applicable only for local search
-    src?: string;
-    track_title: string;
-    album_name: string;
-    artist_names: string[];
-    release_year: number;
-    track_number: number;
-    duration_ms: number;
-    // Can be a direct buffer, or a string pointing to a URL
-    album_cover_image: Buffer | string;
-
-    track?: Track;
-  }
-}
-
-async function loadMetadata(filename: string): Promise<TrackSearchResult> {
+async function loadMetadata(filename: string): Promise<SPDL.Track> {
   const buffer = await readFile(filename);
   const mp3tag = new MP3Tag(buffer);
 
@@ -31,15 +14,25 @@ async function loadMetadata(filename: string): Promise<TrackSearchResult> {
   // @ts-expect-error Types in mp3tag.js library are messed up
   const albumCover = Buffer.from(mp3tag.tags.v2?.APIC?.at(0).data || []);
 
+  // Extract ID from the filename.
+  // I guess there is a better way to do it, but it works.
+  const id = basename(filename).split('_').at(-1)?.replace('.mp3', '');
+  if (id === undefined) {
+    throw new Error('ID is undefined');
+  }
+
   return {
+    id,
     src: filename,
-    track_title: mp3tag.tags.title,
-    album_name: mp3tag.tags.album,
-    artist_names: mp3tag.tags.artist.split(', '),
-    release_year: Number.parseInt(mp3tag.tags.year),
+    name: mp3tag.tags.title,
+    album: {
+      name: mp3tag.tags.album,
+      release_year: Number.parseInt(mp3tag.tags.year),
+      cover: albumCover,
+    },
+    artists: mp3tag.tags.artist.split(', ').map((artist) => ({ name: artist })),
     track_number: Number.parseInt(mp3tag.tags.track),
-    duration_ms: 0,
-    album_cover_image: albumCover,
+    duration: 0,
   };
 }
 
@@ -63,7 +56,7 @@ async function gatherFiles(directory: string): Promise<string[]> {
 
 export default async function localSearch(
   query: string
-): Promise<TrackSearchResult[]> {
+): Promise<SPDL.Track[]> {
   const files = await gatherFiles(
     preferences.get('preferences.musicDirectory')
   );
@@ -72,7 +65,9 @@ export default async function localSearch(
   );
 
   const fuse = new Fuse(metadata, {
-    keys: ['track_title', 'album_title', 'artist_names'],
+    shouldSort: true,
+    includeMatches: true,
+    keys: ['id', 'name', 'artists.name', 'album.name', 'album.release_year'],
   });
 
   return fuse.search(query).map((result) => result.item);

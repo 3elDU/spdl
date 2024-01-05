@@ -1,4 +1,5 @@
 import { Page, PlaylistedTrack, SavedTrack } from '@spotify/web-api-ts-sdk';
+import { fromSpotifyTrack } from 'app/types/convert';
 import { storeToRefs } from 'pinia';
 import { usePreferencesStore } from 'src/stores/preferences';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
@@ -18,10 +19,12 @@ export async function syncLikedTracks() {
   // Sync liked tracks
   let retrieved_all = false;
   while (!retrieved_all) {
-    for (const track of tracks.items) {
-      if (!(await window.ipc.trackExistsOnDisk(track.track))) {
-        console.log(`Downloading track ${track.track.name}`);
-        window.ipc.downloadTrack(track.track, true);
+    for (const track of tracks.items.map((track) =>
+      fromSpotifyTrack(track.track)
+    )) {
+      if (!(await window.ipc.trackExistsOnDisk(track))) {
+        console.log(`Downloading track ${track.name}`);
+        window.ipc.downloadTrack(track, true);
       }
     }
 
@@ -66,14 +69,16 @@ export async function syncPlaylist(playlistID: string) {
 
   // Sync tracks from playlist
   while (!retrieved_all) {
-    for (const track of tracks.items) {
-      // Check, if it isof the type track, not episde
-      if (
-        'album' in track.track &&
-        !(await window.ipc.trackExistsOnDisk(track.track))
-      ) {
-        console.log(`Downloading track ${track.track.name}`);
-        window.ipc.downloadTrack(track.track, true);
+    for (const spotifyTrack of tracks.items) {
+      if (!('album' in spotifyTrack.track)) {
+        continue;
+      }
+
+      const track = fromSpotifyTrack(spotifyTrack.track);
+
+      if (!(await window.ipc.trackExistsOnDisk(track))) {
+        console.log(`Downloading track ${track.name}`);
+        window.ipc.downloadTrack(track, true);
       }
     }
 

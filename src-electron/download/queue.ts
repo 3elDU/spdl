@@ -1,7 +1,9 @@
-type QueueUpdateCallback = (queue: QueueItem[]) => void;
+import { SPDL } from 'app/types';
+
+type QueueUpdateCallback = (queue: SPDL.Queue.Item[]) => void;
 
 export default class Queue {
-  private items: QueueItem[];
+  private items: SPDL.Queue.Item[];
   private callbacks: QueueUpdateCallback[];
 
   constructor() {
@@ -9,7 +11,7 @@ export default class Queue {
     this.callbacks = [];
   }
 
-  addItem(item: QueueItem) {
+  addItem(item: SPDL.Queue.Item) {
     this.items.push(item);
     for (const callback of this.callbacks) {
       callback(this.items);
@@ -17,7 +19,7 @@ export default class Queue {
   }
 
   // Prefere to use this function to update existing items, as it also calls the callbacks
-  updateItem(id: string, newItem: QueueItemData) {
+  updateItem(id: string, newItem: SPDL.Queue.ItemData) {
     const idx = this.items.findIndex((item) => item.id === id);
     if (idx === -1) {
       return;
@@ -34,11 +36,11 @@ export default class Queue {
     }
   }
 
-  getItem(id: string): QueueItem | undefined {
+  getItem(id: string): SPDL.Queue.Item | undefined {
     return queue.items.find((item) => item.id === id);
   }
 
-  getAllItems(): QueueItem[] {
+  getAllItems(): SPDL.Queue.Item[] {
     return this.items;
   }
 

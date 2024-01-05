@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr lFf">
+  <q-layout view="hHh Lpr fFf">
     <q-header elevated class="titlebar">
       <q-toolbar
         class="q-electron-drag"
@@ -51,18 +51,22 @@
         <router-view />
       </q-page>
     </q-page-container>
+
+    <q-footer bordered class="tw-bg-white tw-text-black">
+      <PlayerComponent />
+    </q-footer>
   </q-layout>
 </template>
 
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { useQuasar } from 'quasar';
+import PlayerComponent from 'components/PlayerComponent.vue';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const route = useRoute();
-
 const platform = useQuasar().platform.is.platform;
 
 const drawerOpen = ref(true);

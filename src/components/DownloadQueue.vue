@@ -9,9 +9,11 @@
   <q-table :rows="items" :columns="columns" :filter="filter" flat>
     <template v-slot:body-cell-album="props">
       <q-td :props="props">
-        <q-avatar size="64px" rounded>
-          <q-img :src="props.value" />
-        </q-avatar>
+        <TrackAlbumCover
+          size="64px"
+          :track="props.row.track"
+          show-play-button
+        />
       </q-td>
     </template>
     <template v-slot:body-cell-progress="props">
@@ -63,9 +65,11 @@ import { useQueueStore } from 'src/stores/queue';
 import { ref, toRaw } from 'vue';
 import { formatTrackAuthors, formatTrackDuration } from 'src/util/util';
 import { storeToRefs } from 'pinia';
+import { SPDL } from 'app/types';
+import TrackAlbumCover from './TrackAlbumCover.vue';
 
 const showDownloadNowButton = ref(false);
-function downloadNow(queueItem: QueueItem) {
+function downloadNow(queueItem: SPDL.Queue.Item) {
   window.ipc.downloadTrack(toRaw(queueItem.track), false);
 }
 
@@ -74,7 +78,7 @@ const columns: QTableColumn[] = [
   {
     name: 'album',
     align: 'left',
-    field: (row: QueueItem) => row.track.album.images[0].url,
+    field: (row: SPDL.Queue.Item) => row.track.album.cover_url,
     label: 'Album cover',
     sortable: false,
     style: 'width: 64px',
@@ -89,7 +93,7 @@ const columns: QTableColumn[] = [
   {
     name: 'name',
     align: 'left',
-    field: (row: QueueItem) => row.track.name,
+    field: (row: SPDL.Queue.Item) => row.track.name,
     label: 'Name',
     format: (val, row) => `${row.author} — ${val}`,
     sortable: true,
@@ -97,7 +101,7 @@ const columns: QTableColumn[] = [
   {
     name: 'duration',
     align: 'right',
-    field: (row: QueueItem) => row.track.duration_ms,
+    field: (row: SPDL.Queue.Item) => row.track.duration,
     label: 'Duration',
     format: (val: number) => formatTrackDuration(val),
     sortable: true,
