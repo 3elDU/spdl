@@ -9,6 +9,8 @@ import { existsSync } from 'fs';
 import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
+import ytsr from 'ytsr';
+import { parseTimeToSeconds } from './util';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -77,16 +79,43 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
   const youtubeSearchQuery = `${joinArtistNames(track.artists, ' ')} ${
     track.name
   }`;
-  const result: VideoSearchResults = JSON.parse(
-    await ytDlp.execPromise([`ytsearch5:${youtubeSearchQuery}`, '-J'])
-  );
+  const result = await ytsr(youtubeSearchQuery, {
+    safeSearch: false,
+    limit: 8,
+  });
 
   queue.updateItem(track.id, {
     status: 'downloading',
     progress: 10,
   });
 
-  const closestMatch = findClosestMatch(result.entries, track.duration);
+  // Filter the values that are videos
+  const videoResults = result.items.filter(
+    (item) => item.type === 'video'
+  ) as ytsr.Video[];
+
+  // If there are no videos found, spit out an error
+  if (videoResults.length === 0) {
+    queue.updateItem(track.id, {
+      status: 'error',
+      error: 'No videos found!',
+    });
+    return;
+  }
+
+  // Pick the first video
+  let closestMatch = videoResults[0];
+
+  // If it differs more than 20 seconds in length, compared to the track object,
+  // search for a best match by length
+  if (
+    Math.abs(
+      parseTimeToSeconds(closestMatch.duration as string) - track.duration
+    ) >= 20
+  ) {
+    closestMatch = findClosestMatch(result.items, track.duration);
+  }
+
   return new Promise<void>((resolve, reject) => {
     ytDlp
       .exec([
@@ -188,21 +217,25 @@ async function embedMetadata(path: string, track: SPDL.Track) {
 
 // Find the closest matching video by length
 function findClosestMatch(
-  searchResults: VideoEntry[],
+  searchResults: ytsr.Item[],
   desiredLength: number
-): VideoEntry {
+): ytsr.Video {
   let closestDiff = Infinity;
   let closestId = -1;
 
   for (let i = 0; i < searchResults.length; i++) {
     const video = searchResults[i];
+    if (video.type !== 'video' || video.duration === null) {
+      continue;
+    }
 
-    const diff = Math.abs(video.duration - desiredLength);
+    const duration = parseTimeToSeconds(video.duration);
+    const diff = Math.abs(duration - desiredLength);
     if (diff < closestDiff) {
       closestDiff = diff;
       closestId = i;
     }
   }
 
-  return searchResults[closestId];
+  return searchResults[closestId] as ytsr.Video;
 }

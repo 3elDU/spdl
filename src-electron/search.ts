@@ -12,7 +12,10 @@ async function loadMetadata(filename: string): Promise<SPDL.Track> {
   mp3tag.read();
 
   // @ts-expect-error Types in mp3tag.js library are messed up
-  const albumCover = Buffer.from(mp3tag.tags.v2?.APIC?.at(0).data || []);
+  const albumCover = mp3tag.tags.v2?.APIC?.at(0).data
+    ? // @ts-expect-error Types in mp3tag.js library are messed up
+      Buffer.from(mp3tag.tags.v2.APIC.at(0).data)
+    : undefined;
 
   // Extract ID from the filename.
   // I guess there is a better way to do it, but it works.

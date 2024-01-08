@@ -107,7 +107,6 @@ function setParallelDownloadingLimit() {
     typeof parallelDownloadingLimit.value === 'number' &&
     !Number.isNaN(parallelDownloadingLimit.value)
   ) {
-    console.log('setting', parallelDownloadingLimit.value);
     preferences.preferences.parallelDownloadingLimit =
       parallelDownloadingLimit.value;
     window.ipc.relaunch();

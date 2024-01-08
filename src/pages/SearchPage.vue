@@ -112,7 +112,7 @@ async function performSearch(query: string, searchLocal: boolean) {
     tracks.value = await window.ipc.searchLocal(query);
     searchedLocal.value = true;
   } else {
-    const res = await spotify.api.search(query, ['track']);
+    const res = await spotify.api.search(query, ['track'], undefined, 50);
     tracks.value = res.tracks.items.map((track) => fromSpotifyTrack(track));
     searchedLocal.value = false;
   }

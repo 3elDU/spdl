@@ -1,5 +1,6 @@
 import { SPDL } from 'app/types';
 import { defineStore } from 'pinia';
+import { Notify } from 'quasar';
 import { toRaw } from 'vue';
 
 export const usePlayerStore = defineStore('player', {
@@ -64,6 +65,17 @@ export const usePlayerStore = defineStore('player', {
       }
 
       const base64 = await window.ipc.loadAudioFile(toRaw(track));
+      if (base64 === undefined) {
+        if (this.track) {
+          this.history.splice(this.idx, 1);
+        }
+        Notify.create({
+          type: 'negative',
+          message: 'Failed to load the track from disk',
+        });
+        return;
+      }
+
       this.audio.src = 'data:audio/mp3;base64,' + base64;
       this.loaded = true;
 

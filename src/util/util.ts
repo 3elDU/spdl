@@ -1,16 +1,17 @@
 import { SPDL } from 'app/types';
 
 // Example:
-// 335000 -> 5:35
+// 335 -> 5:35
 // Should also correctly format hours
-export function formatTrackDuration(duration_ms: number): string {
-  // Convert milliseconds to seconds
-  const durationInSeconds = Math.floor(duration_ms / 1000);
+export function formatTrackDuration(duration: number): string {
+  if (Number.isNaN(duration)) {
+    return '00:00';
+  }
 
   // Calculate hours, minutes, and seconds
-  const hours = Math.floor(durationInSeconds / 3600);
-  const minutes = Math.floor((durationInSeconds % 3600) / 60);
-  const seconds = durationInSeconds % 60;
+  const hours = Math.floor(duration / 3600);
+  const minutes = Math.floor((duration % 3600) / 60);
+  const seconds = Math.floor(duration % 60);
 
   // Format the time components
   const formattedHours =

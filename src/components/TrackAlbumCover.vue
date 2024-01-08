@@ -6,24 +6,24 @@
     @mouseleave="mouseHovering = false"
   >
     <q-img
-      v-if="track.album.cover_url"
-      :src="track.album.cover_url"
+      v-if="track.album.cover"
+      :src="bufferToImage(track.album.cover)"
       class="tw-absolute tw-rounded"
     />
     <q-img
-      v-else-if="track.album.cover"
-      :src="bufferToImage(track.album.cover)"
+      v-else-if="track.album.cover_url"
+      :src="track.album.cover_url"
       class="tw-absolute tw-rounded"
     />
     <div
       v-else
-      class="w-full h-full tw-flex tw-items-center tw-justify-center tw-bg-neutral-300 text-h4"
+      class="tw-absolute tw-rounded w-full h-full tw-flex tw-items-center tw-justify-center tw-bg-neutral-300 text-h4"
     >
       No image
     </div>
 
     <InlineTrackPlayButton
-      v-if="showPlayButton && mouseHovering"
+      v-show="showPlayButton && mouseHovering"
       :track="track"
       class="tw-bg-white"
     />
@@ -34,11 +34,11 @@
 import { Buffer } from 'buffer';
 import InlineTrackPlayButton from './InlineTrackPlayButton.vue';
 import { SPDL } from 'app/types';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 
 const mouseHovering = ref(false);
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     size?: string;
     track: SPDL.Track;
@@ -48,10 +48,6 @@ const props = withDefaults(
     showPlayButton: false,
   }
 );
-
-watch(props.track, (newTrack) => {
-  console.log('upd', newTrack);
-});
 
 // Converts a raw buffer into a base64-encoded image
 function bufferToImage(array: Uint8Array): string {

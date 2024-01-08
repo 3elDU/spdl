@@ -16,7 +16,7 @@ import { usePlayerStore } from 'src/stores/player';
 import { useQueueStore } from 'src/stores/queue';
 import { Ref, computed, ref, toRaw } from 'vue';
 
-const { track } = defineProps<{
+const props = defineProps<{
   track: SPDL.Track;
 }>();
 
@@ -27,22 +27,22 @@ const player = usePlayerStore();
 const shiftPressed = useKeyModifier('Shift');
 
 const buttonIcon = computed(() => {
-  if (player.track?.id === track.id && !player.paused) {
+  if (player.track?.id === props.track.id && !player.paused) {
     return 'pause';
   } else if (shiftPressed.value) {
-    return 'add_to_queue';
+    return 'playlist_add';
   } else {
     return 'play_arrow';
   }
 });
 
 function click() {
-  if (player.track?.id === track.id && !player.paused) {
+  if (player.track?.id === props.track.id && !player.paused) {
     player.pause();
   } else if (shiftPressed.value) {
-    player.addToQueue(track);
+    player.addToQueue(props.track);
   } else {
-    player.playTrack(track);
+    player.playTrack(props.track);
   }
 }
 
@@ -53,10 +53,10 @@ const existsOnDisk: Ref<string | undefined> = ref(undefined);
 // So, we either check if the queue has this track marked as completed, or that the queue
 // doesn't include this track at all
 
-const queueItem = queue.items.find((item) => item.track.id === track.id);
+const queueItem = queue.items.find((item) => item.track.id === props.track.id);
 if ((queueItem && queueItem.status === 'success') || queueItem === undefined) {
   window.ipc
-    .trackExistsOnDisk(toRaw(track))
+    .trackExistsOnDisk(toRaw(props.track))
     .then((exists) => (existsOnDisk.value = exists));
 }
 </script>

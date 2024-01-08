@@ -25,9 +25,9 @@
       class="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-flex tw-flex-col tw-items-center"
     >
       <div class="text-caption" v-if="audio && player.loaded">
-        {{ formatTrackDuration(player.currentTime * 1000) }}
+        {{ formatTrackDuration(player.currentTime) }}
         /
-        {{ formatTrackDuration(audio.duration * 1000) }}
+        {{ formatTrackDuration(audio.duration) }}
       </div>
 
       <div class="tw-flex tw-gap-6">
@@ -101,7 +101,7 @@
     >
     </q-slider>
 
-    <q-btn round flat icon="queue_music" :disabled="player.history.length < 2">
+    <q-btn round flat icon="queue_music">
       <q-badge v-if="player.hasNextItems" floating>{{
         player.countNextItems.toString()
       }}</q-badge>
