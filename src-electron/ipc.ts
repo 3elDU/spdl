@@ -8,6 +8,7 @@ import { statLibrary } from './stat/stat';
 import localSearch from './search';
 import { readFile } from 'fs/promises';
 import { SPDL } from 'app/types';
+import initAuthServer from './auth';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -27,6 +28,14 @@ export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('relaunch', () => {
     app.relaunch();
     app.exit();
+  });
+
+  ipcMain.on('auth:launchServer', () => {
+    initAuthServer();
+  });
+  ipcMain.on('auth:redirectToApp', (_event, searchParams: string) => {
+    console.log(process.env.APP_URL);
+    window.loadURL(new URL(searchParams, process.env.APP_URL).href);
   });
 
   ipcMain.handle('preferences:get', () => {

@@ -1,6 +1,6 @@
 import { SPDL } from 'app/types';
 import { preferences } from '../store';
-import { downloadTrack } from './downloader';
+import { downloadTrack, downloadYTDLP } from './downloader';
 import { queue } from './queue';
 
 let tracksDownloading = 0;
@@ -18,6 +18,11 @@ export function downloadTrackQueued(track: SPDL.Track) {
 }
 
 async function tick() {
+  if (!preferences.get('ytdlp_downloaded')) {
+    await downloadYTDLP();
+    return;
+  }
+
   if (
     tracksDownloading <
     preferences.get('preferences.parallelDownloadingLimit', 2)

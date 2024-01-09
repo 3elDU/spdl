@@ -1,5 +1,6 @@
 import { UserPreferences } from './store';
 import { LibraryStats } from './stat/stat';
+import { SPDL } from 'app/types';
 
 interface ElectronIPC {
   minimize(): void;
@@ -7,6 +8,9 @@ interface ElectronIPC {
   close(): void;
 
   relaunch(): void;
+
+  launchAuthServer(redirectURL: string): Promise<void>;
+  redirectToApp(searchParams: string): void;
 
   getPreferences(): Promise<UserPreferences>;
   updatePreferences(newPreferences: UserPreferences): void;

@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld('ipc', {
 
   relaunch: () => ipcRenderer.send('relaunch'),
 
+  launchAuthServer: () => ipcRenderer.send('auth:launchServer'),
+  redirectToApp: (searchParams: string) =>
+    ipcRenderer.send('auth:redirectToApp', searchParams),
+
   getPreferences: () => ipcRenderer.invoke('preferences:get'),
   updatePreferences: (newPreferences: UserPreferences) => {
     ipcRenderer.send('preferences:update', newPreferences);

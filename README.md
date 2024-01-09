@@ -4,9 +4,9 @@ To be able to interact with spotify API, you need to create an app in [Spotify d
 Then go to app's settings, and do two things:
 
 1. Copy Client ID into spdl's settings
-2. Add two URLs to Redirect URIs
-   - For electron development server: http://localhost:9300/
-   - For electron build: file://
+2. Add this to Redirect URIs
+
+- http://localhost:61624/
 
 ## Install dependencies
 
@@ -22,4 +22,6 @@ quasar dev -m electron
 
 ## Build
 
-_TODO_
+```bash
+quasar build -m electron
+```

@@ -37,6 +37,9 @@ export interface UserPreferences {
 
 export const preferences = new Store({
   schema: {
+    ytdlp_downloaded: {
+      type: 'boolean',
+    },
     preferences: {
       type: 'object',
       properties: {
@@ -129,6 +132,7 @@ export const preferences = new Store({
     },
   },
   defaults: {
+    ytdlp_downloaded: false,
     preferences: {
       musicDirectory: join(app.getPath('music'), 'SPDL'),
       parallelDownloadingLimit: availableParallelism(),

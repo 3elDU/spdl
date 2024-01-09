@@ -23,7 +23,7 @@
     </div>
 
     <InlineTrackPlayButton
-      v-show="showPlayButton && mouseHovering"
+      v-if="showPlayButton && mouseHovering"
       :track="track"
       class="tw-bg-white"
     />

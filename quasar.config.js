@@ -185,7 +185,12 @@ module.exports = configure(function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'spdl',
+        appId: 'ua.petafloppa.spdl',
+        productName: 'SPDL',
+
+        mac: {
+          category: 'public.app-category.music',
+        },
       },
     },
 

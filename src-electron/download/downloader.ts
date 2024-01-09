@@ -5,7 +5,6 @@ import MP3Tag from 'mp3tag.js';
 import YTDlpWrap from 'yt-dlp-wrap';
 import ffmpegPath from 'ffmpeg-static';
 import { preferences } from '../store';
-import { existsSync } from 'fs';
 import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
@@ -21,11 +20,12 @@ function calculateYtdlpPath(): string {
 
 const ytDlp = new YTDlpWrap(calculateYtdlpPath());
 
-async function downloadYTDLP() {
-  // Skip, if yt-dlp is already downloaded
-  if (existsSync(calculateYtdlpPath())) {
+let downloading = false;
+export async function downloadYTDLP() {
+  if (downloading) {
     return;
   }
+  downloading = true;
 
   // Grab the latest release
   const releases = await YTDlpWrap.getGithubReleases(1, 1);
@@ -36,6 +36,8 @@ async function downloadYTDLP() {
   console.log(`YTDLP path: ${ytdlpPath}`);
 
   await YTDlpWrap.downloadFromGithub(ytdlpPath, latestReleaseVersion);
+  preferences.set('ytdlp_downloaded', true);
+  downloading = false;
 }
 
 // Sanitizes part of the path, e.g. album name, or the author name.
@@ -57,7 +59,6 @@ export function calculateTrackPath(track: SPDL.Track): string {
 
 // Downloads the track from YouTube, and embeds metadata in it automatically
 export async function downloadTrack(track: SPDL.Track): Promise<void> {
-  await downloadYTDLP();
   if (ffmpegPath === null) {
     throw new Error('no ffmpeg!');
   }
@@ -111,17 +112,19 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
   if (
     Math.abs(
       parseTimeToSeconds(closestMatch.duration as string) - track.duration
-    ) >= 20
+    ) >= 5
   ) {
     closestMatch = findClosestMatch(result.items, track.duration);
   }
 
+  // When the app is packages for ASAR format, ffmpeg-static points to the wrong path
+  const ffmpeg = ffmpegPath.replace('app.asar', 'app.asar.unpacked');
   return new Promise<void>((resolve, reject) => {
     ytDlp
       .exec([
         '-x',
         '--ffmpeg-location',
-        ffmpegPath as string,
+        ffmpeg,
         '--audio-format',
         'mp3',
         '-f',

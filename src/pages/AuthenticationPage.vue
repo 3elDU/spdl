@@ -34,9 +34,9 @@
             target="_blank"
             >Spotify Dashboard</a
           >, and add
-          <strong @click="copyRedirectURL" class="tw-cursor-pointer">{{
-            calculateRedirectURL()
-          }}</strong>
+          <strong @click="copyRedirectURL" class="tw-cursor-pointer"
+            >http://localhost:61624/</strong
+          >
           to the list of Redirect URIs, then copy client id from settings and
           paste it in the input field below.
         </div>
@@ -83,7 +83,7 @@
 import { UserProfile } from '@spotify/web-api-ts-sdk';
 import { Notify } from 'quasar';
 import { usePreferencesStore } from 'src/stores/preferences';
-import { calculateRedirectURL, useSpotifyAPIStore } from 'src/stores/spotify';
+import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { Ref, ref } from 'vue';
 
 const profile: Ref<UserProfile | undefined> = ref(undefined);
@@ -105,7 +105,7 @@ if (spotify.authenticated) {
 }
 
 async function copyRedirectURL() {
-  await navigator.clipboard.writeText(calculateRedirectURL());
+  await navigator.clipboard.writeText('http://localhost:61624/');
   Notify.create({
     type: 'positive',
     message: 'Copied redirect URL to clipboard',
