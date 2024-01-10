@@ -7,6 +7,7 @@
     :icon="buttonIcon"
     @click="click"
   />
+  <q-icon v-else-if="placeholder" size="sm" name="pending" />
 </template>
 
 <script setup lang="ts">
@@ -16,9 +17,19 @@ import { usePlayerStore } from 'src/stores/player';
 import { useQueueStore } from 'src/stores/queue';
 import { Ref, computed, ref, toRaw } from 'vue';
 
-const props = defineProps<{
-  track: SPDL.Track;
-}>();
+const props = withDefaults(
+  defineProps<{
+    track: SPDL.Track;
+    placeholder?: boolean;
+    // If the track already exists in the history, switch to that index in the history,
+    // rather than playing a track at a current position
+    switchToIndex?: boolean;
+  }>(),
+  {
+    placeholder: false,
+    switchToIndex: false,
+  }
+);
 
 const queue = useQueueStore();
 const player = usePlayerStore();
@@ -42,7 +53,15 @@ function click() {
   } else if (shiftPressed.value) {
     player.addToQueue(props.track);
   } else {
-    player.playTrack(props.track);
+    const trackIdx = player.history.findIndex(
+      (track) => props.track.id === track.id
+    );
+
+    if (props.switchToIndex && trackIdx !== -1) {
+      player.playFromIndex(trackIdx);
+    } else {
+      player.playTrack(props.track);
+    }
   }
 }
 

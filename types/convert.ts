@@ -7,6 +7,7 @@ export function fromSpotifyTrack(track: Track): SPDL.Track {
     id: track.id,
     name: track.name,
     album: {
+      id: track.album.id,
       name: track.album.name,
       cover_url: track.album.images.at(0)?.url,
       release_year: new Date(track.album.release_date).getFullYear(),

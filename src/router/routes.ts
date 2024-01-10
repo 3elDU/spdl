@@ -34,6 +34,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'Library ' },
       },
       {
+        path: 'tracklist/:type/:id',
+        name: 'tracklist',
+        props: true,
+        component: () => import('pages/TrackListPage.vue'),
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('pages/PreferencesPage.vue'),

@@ -1,5 +1,5 @@
 <template>
-  <q-menu anchor="top left" self="bottom right">
+  <q-menu anchor="top left" self="bottom right" class="tw-h-[50vh]">
     <div class="tw-p-4 tw-flex tw-gap-2">
       <q-btn
         color="negative"
@@ -25,7 +25,7 @@
         :key="idx"
         :active="player.idx === idx"
       >
-        <QueueItemPlayButton :index="idx" :track="track" />
+        <DynamicTrackIndex :index="idx" :track="track" switch-to-index />
 
         <q-item-section avatar>
           <TrackAlbumCover :track="track" />
@@ -54,7 +54,7 @@
 import { usePlayerStore } from 'src/stores/player';
 import { formatTrackAuthors } from 'src/util/util';
 import TrackAlbumCover from 'components/TrackAlbumCover.vue';
-import QueueItemPlayButton from './QueueItemPlayButton.vue';
+import DynamicTrackIndex from 'components/DynamicTrackIndex.vue';
 
 const player = usePlayerStore();
 </script>

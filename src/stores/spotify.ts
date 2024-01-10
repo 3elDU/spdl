@@ -47,7 +47,7 @@ export const useSpotifyAPIStore = defineStore('spotify', {
   },
   actions: {
     async authenticate() {
-      if (this.clientID === '') {
+      if (!this.clientID) {
         return;
       }
       await window.ipc.launchAuthServer(
@@ -65,12 +65,14 @@ export const useSpotifyAPIStore = defineStore('spotify', {
     setClientID(clientID: string | undefined) {
       console.log(`setClientID() called with ${clientID}`);
       this.clientID = clientID;
-      this.api = SpotifyApi.withUserAuthorization(
-        clientID ?? '',
-        'http://localhost:61624/',
-        scopes,
-        { redirectionStrategy }
-      );
+      if (clientID) {
+        this.api = SpotifyApi.withUserAuthorization(
+          clientID ?? '',
+          'http://localhost:61624/',
+          scopes,
+          { redirectionStrategy }
+        );
+      }
     },
   },
   persist: {

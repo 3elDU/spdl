@@ -21,6 +21,7 @@ export declare namespace SPDL {
   }
 
   export interface Album {
+    id: string;
     name: string;
     release_year: number;
     // URL to the album cover picture

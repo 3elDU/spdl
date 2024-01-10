@@ -13,7 +13,11 @@
       <TrackAlbumCover :track="player.track" size="64px" />
       <q-item>
         <q-item-section>
-          <q-item-label>{{ player.track.name }}</q-item-label>
+          <q-item-label
+            class="tw-cursor-pointer"
+            @click="openTrackAlbum(player.track)"
+            >{{ player.track.name }}</q-item-label
+          >
           <q-item-label caption>{{
             joinArtistNames(player.track.artists || [], ', ')
           }}</q-item-label>
@@ -129,6 +133,10 @@ import { joinArtistNames } from 'app/types/util';
 import { useThrottleFn } from '@vueuse/core';
 import { formatTrackDuration } from 'src/util/util';
 import MusicQueueMenu from './playerQueueMenu/MusicQueueMenu.vue';
+import { useRouter } from 'vue-router';
+import { SPDL } from 'app/types';
+
+const router = useRouter();
 
 const audio: Ref<HTMLAudioElement | undefined> = ref(undefined);
 const player = usePlayerStore();
@@ -167,4 +175,14 @@ const updateTime = useThrottleFn(() => {
     player.currentTime = audio.value.currentTime;
   }
 }, 1000);
+
+function openTrackAlbum(track: SPDL.Track) {
+  router.push({
+    name: 'tracklist',
+    params: {
+      type: 'album',
+      id: track.album.id,
+    },
+  });
+}
 </script>

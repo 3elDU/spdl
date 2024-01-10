@@ -95,8 +95,9 @@
         <q-card-section class="tw-overflow-hidden">
           <div
             v-if="playlist.name"
-            class="text-h6 tw-truncate"
+            class="text-h6 tw-truncate tw-cursor-pointer"
             :title="playlist.name"
+            @click="openPlaylist(playlist)"
           >
             {{ playlist.name }}
           </div>
@@ -158,7 +159,9 @@ import { usePreferencesStore } from 'src/stores/preferences';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { syncPlaylist, syncLikedTracks } from 'src/sync/sync';
 import { ref, Ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const spotify = useSpotifyAPIStore();
 const { preferences } = storeToRefs(usePreferencesStore());
 const loading = ref(true);
@@ -176,6 +179,16 @@ async function load() {
 }
 
 load();
+
+function openPlaylist(playlist: SimplifiedPlaylist) {
+  router.push({
+    name: 'tracklist',
+    params: {
+      type: 'playlist',
+      id: playlist.id,
+    },
+  });
+}
 
 function addToSyncedPlaylists(playlist: SimplifiedPlaylist) {
   preferences.value.syncedPlaylists.push({

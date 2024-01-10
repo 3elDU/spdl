@@ -79,8 +79,9 @@
 
               <q-card-section class="tw-overflow-hidden">
                 <div
-                  class="text-h6 tw-font-normal tw-truncate"
+                  class="text-h6 tw-font-normal tw-truncate tw-cursor-pointer"
                   :title="playlist.name"
+                  @click="openPlaylist(playlist)"
                 >
                   {{ playlist.name.length > 0 ? playlist.name : 'No name' }}
                 </div>
@@ -145,6 +146,7 @@ import { syncPlaylist } from 'src/sync/sync';
 import { storeToRefs } from 'pinia';
 import { QCarousel } from 'quasar';
 import { LibraryStats } from 'app/src-electron/stat/stat';
+import { SyncedPlaylist } from 'app/src-electron/store';
 
 const router = useRouter();
 
@@ -169,6 +171,16 @@ function search(query: string, searchLocal: boolean) {
     query: {
       query: query,
       performLocalSearch: searchLocal.toString(),
+    },
+  });
+}
+
+function openPlaylist(playlist: SyncedPlaylist) {
+  router.push({
+    name: 'tracklist',
+    params: {
+      type: 'playlist',
+      id: playlist.id,
     },
   });
 }
