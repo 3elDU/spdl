@@ -1,5 +1,10 @@
 <template>
-  <q-menu anchor="top left" self="bottom right" class="tw-h-[50vh]">
+  <q-menu
+    anchor="top left"
+    self="bottom right"
+    class="tw-h-[50vh]"
+    @show="scrollToCurrentTrack"
+  >
     <div class="tw-p-4 tw-flex tw-gap-2">
       <q-btn
         color="negative"
@@ -22,6 +27,11 @@
     <q-list separator>
       <q-item
         v-for="(track, idx) in player.history"
+        :ref="(el: QItem) => {
+          if (idx === player.idx) {
+            currentTrackRef = el;
+          }
+        }"
         :key="idx"
         :active="player.idx === idx"
       >
@@ -55,6 +65,18 @@ import { usePlayerStore } from 'src/stores/player';
 import { formatTrackAuthors } from 'src/util/util';
 import TrackAlbumCover from 'components/TrackAlbumCover.vue';
 import DynamicTrackIndex from 'components/DynamicTrackIndex.vue';
+import { Ref, ref } from 'vue';
+import { QItem } from 'quasar';
 
 const player = usePlayerStore();
+
+const currentTrackRef: Ref<QItem | undefined> = ref(undefined);
+function scrollToCurrentTrack() {
+  const element: Element = currentTrackRef.value?.$el;
+  if (element) {
+    element.scrollIntoView({
+      block: 'center',
+    });
+  }
+}
 </script>

@@ -145,6 +145,40 @@ onMounted(() => {
   player.audio = audio.value;
   if (audio.value) {
     audio.value.volume = player.volume;
+
+    navigator.mediaSession.setActionHandler('pause', () => {
+      player.togglePause();
+    });
+    navigator.mediaSession.setActionHandler('play', () => {
+      player.togglePause();
+    });
+
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      if (details.seekOffset) {
+        player.setTime(player.currentTime - details.seekOffset);
+      } else {
+        player.setTime(player.currentTime - 10);
+      }
+    });
+    navigator.mediaSession.setActionHandler('seekbackward', (details) => {
+      if (details.seekOffset) {
+        player.setTime(player.currentTime + details.seekOffset);
+      } else {
+        player.setTime(player.currentTime + 10);
+      }
+    });
+    navigator.mediaSession.setActionHandler('seekto', (details) => {
+      if (details.seekTime) {
+        player.setTime(details.seekTime);
+      }
+    });
+
+    navigator.mediaSession.setActionHandler('previoustrack', () => {
+      player.playPrevious();
+    });
+    navigator.mediaSession.setActionHandler('nexttrack', () => {
+      player.playNextFromQueue();
+    });
   }
 });
 

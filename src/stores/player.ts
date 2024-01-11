@@ -88,6 +88,25 @@ export const usePlayerStore = defineStore('player', {
       // Add track to history, if the function was called externally
       this.history[this.idx] = track;
       await this.play();
+
+      const images: MediaImage[] = [];
+      if (track.album.cover) {
+        images.push({
+          src: 'data:image/jpeg,base64,' + track.album.cover.toString('base64'),
+        });
+      } else if (track.album.cover_url) {
+        images.push({
+          src: track.album.cover_url,
+        });
+      }
+
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.name,
+        artist: track.artists[0].name,
+        album: track.album.name,
+        artwork: images,
+      });
+      navigator.mediaSession.playbackState = 'playing';
     },
     async playFromIndex(idx: number) {
       const track = this.history.at(idx);
@@ -156,6 +175,7 @@ export const usePlayerStore = defineStore('player', {
       } else {
         this.audio?.pause();
         this.paused = true;
+        navigator.mediaSession.playbackState = 'paused';
       }
     },
 
