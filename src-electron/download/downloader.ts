@@ -8,8 +8,8 @@ import { preferences } from '../store';
 import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
-import ytsr from 'ytsr';
-import { parseTimeToSeconds } from './util';
+import { assembleSearchQuery, findClosestMatch, searchYT } from './search';
+import YouTube from 'youtube-sr';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -77,25 +77,7 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
     recursive: true,
   });
 
-  const youtubeSearchQuery = `${joinArtistNames(track.artists, ' ')} ${
-    track.name
-  }`;
-  const result = await ytsr(youtubeSearchQuery, {
-    safeSearch: false,
-    limit: 8,
-  });
-
-  queue.updateItem(track.id, {
-    status: 'downloading',
-    progress: 10,
-  });
-
-  // Filter the values that are videos
-  const videoResults = result.items.filter(
-    (item) => item.type === 'video'
-  ) as ytsr.Video[];
-
-  // If there are no videos found, spit out an error
+  const videoResults = await searchYT(track);
   if (videoResults.length === 0) {
     queue.updateItem(track.id, {
       status: 'error',
@@ -104,18 +86,23 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
     return;
   }
 
-  // Pick the first video
-  let closestMatch = videoResults[0];
+  queue.updateItem(track.id, {
+    status: 'downloading',
+    progress: 10,
+  });
 
-  // If it differs more than 20 seconds in length, compared to the track object,
-  // search for a best match by length
-  if (
-    Math.abs(
-      parseTimeToSeconds(closestMatch.duration as string) - track.duration
-    ) >= 5
-  ) {
-    closestMatch = findClosestMatch(result.items, track.duration);
+  const closestMatch = findClosestMatch(videoResults, track.duration);
+
+  if (closestMatch === undefined) {
+    queue.updateItem(track.id, {
+      status: 'error',
+      error: 'No videos found!',
+    });
+    return;
   }
+
+  const info = await YouTube.getVideo(closestMatch);
+  console.log(info);
 
   // When the app is packages for ASAR format, ffmpeg-static points to the wrong path
   const ffmpeg = ffmpegPath.replace('app.asar', 'app.asar.unpacked');
@@ -134,7 +121,7 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
         '-o',
         trackFilename,
         '--',
-        closestMatch.id,
+        closestMatch.id as string,
       ])
       .on('progress', (progress) => {
         queue.updateItem(track.id, {
@@ -147,7 +134,7 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
         queue.updateItem(track.id, {
           status: 'success',
           path: fullPath,
-          tooltip: `Search query - '${youtubeSearchQuery}'`,
+          tooltip: `Search query - '${assembleSearchQuery(track)}'`,
         });
 
         // Remove item from a queue after 30 seconds
@@ -216,29 +203,4 @@ async function embedMetadata(path: string, track: SPDL.Track) {
   mp3tag.read();
 
   await writeFile(path, Buffer.from(mp3tag.buffer));
-}
-
-// Find the closest matching video by length
-function findClosestMatch(
-  searchResults: ytsr.Item[],
-  desiredLength: number
-): ytsr.Video {
-  let closestDiff = Infinity;
-  let closestId = -1;
-
-  for (let i = 0; i < searchResults.length; i++) {
-    const video = searchResults[i];
-    if (video.type !== 'video' || video.duration === null) {
-      continue;
-    }
-
-    const duration = parseTimeToSeconds(video.duration);
-    const diff = Math.abs(duration - desiredLength);
-    if (diff < closestDiff) {
-      closestDiff = diff;
-      closestId = i;
-    }
-  }
-
-  return searchResults[closestId] as ytsr.Video;
 }

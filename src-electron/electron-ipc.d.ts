@@ -21,6 +21,7 @@ interface ElectronIPC {
   openMusicDirectory(): void;
 
   downloadTrack(track: SPDL.Track, queued: boolean): void;
+  getStreamingURL(track: SPDL.Track): Promise<string | undefined>;
   // Returns path to the audio file, if track exists on disk
   trackExistsOnDisk(track: SPDL.Track): Promise<string | undefined>;
 

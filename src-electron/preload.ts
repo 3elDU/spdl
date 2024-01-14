@@ -37,6 +37,9 @@ contextBridge.exposeInMainWorld('ipc', {
       track
     );
   },
+  getStreamingURL: (track: SPDL.Track) => {
+    return ipcRenderer.invoke('spotify:getStreamingURL', track);
+  },
   trackExistsOnDisk: (track: SPDL.Track): Promise<string | undefined> => {
     return ipcRenderer.invoke('spotify:trackExistsOnDisk', track);
   },

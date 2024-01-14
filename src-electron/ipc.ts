@@ -9,6 +9,7 @@ import localSearch from './search';
 import { readFile } from 'fs/promises';
 import { SPDL } from 'app/types';
 import initAuthServer from './auth';
+import { getTrackStreamURL } from './download/stream';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -70,6 +71,9 @@ export default function registerIPCHandlers(window: BrowserWindow) {
 
   ipcMain.on('spotify:downloadTrack', (_event, track: SPDL.Track) => {
     downloadTrack(track);
+  });
+  ipcMain.handle('spotify:getStreamingURL', (_event, track: SPDL.Track) => {
+    return getTrackStreamURL(track);
   });
   ipcMain.on('spotify:downloadTrackQueued', (_event, track: SPDL.Track) => {
     downloadTrackQueued(track);

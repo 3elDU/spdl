@@ -1,13 +1,5 @@
 <template>
-  <q-btn
-    v-if="existsOnDisk"
-    size="sm"
-    flat
-    round
-    :icon="buttonIcon"
-    @click="click"
-  />
-  <q-icon v-else-if="placeholder" size="sm" name="pending" />
+  <q-btn size="sm" flat round :icon="buttonIcon" @click="click" />
 </template>
 
 <script setup lang="ts">
@@ -20,13 +12,11 @@ import { Ref, computed, ref, toRaw } from 'vue';
 const props = withDefaults(
   defineProps<{
     track: SPDL.Track;
-    placeholder?: boolean;
     // If the track already exists in the history, switch to that index in the history,
     // rather than playing a track at a current position
     switchToIndex?: boolean;
   }>(),
   {
-    placeholder: false,
     switchToIndex: false,
   }
 );
@@ -47,11 +37,19 @@ const buttonIcon = computed(() => {
   }
 });
 
-function click() {
+async function click() {
+  const track = structuredClone(toRaw(props.track));
+
+  let streamingURL: string | undefined = undefined;
+  if (!track.stream_url && !existsOnDisk.value) {
+    streamingURL = await window.ipc.getStreamingURL(toRaw(props.track));
+    track.stream_url = streamingURL;
+  }
+
   if (player.track?.id === props.track.id && !player.paused) {
     player.pause();
   } else if (shiftPressed.value) {
-    player.addToQueue(props.track);
+    player.addToQueue(track);
   } else {
     const trackIdx = player.history.findIndex(
       (track) => props.track.id === track.id
@@ -60,7 +58,7 @@ function click() {
     if (props.switchToIndex && trackIdx !== -1) {
       player.playFromIndex(trackIdx);
     } else {
-      player.playTrack(props.track);
+      player.playTrack(track);
     }
   }
 }

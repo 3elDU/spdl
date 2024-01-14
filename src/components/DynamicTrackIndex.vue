@@ -8,7 +8,6 @@
     <inline-track-play-button
       :track="track"
       v-if="hovered || isPlaying"
-      :placeholder="true"
       :switch-to-index="switchToIndex"
     />
     <q-item-label v-else>{{ props.index + 1 }}</q-item-label>

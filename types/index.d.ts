@@ -2,6 +2,8 @@ export declare namespace SPDL {
   export interface Track {
     // Audio file location on disk
     src?: string;
+    // Direct URL to audio file for streaming
+    stream_url?: string;
     // Track's ID from the spotify API
     id: string;
     // Track name

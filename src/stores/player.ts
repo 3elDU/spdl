@@ -64,20 +64,34 @@ export const usePlayerStore = defineStore('player', {
         return;
       }
 
-      const base64 = await window.ipc.loadAudioFile(toRaw(track));
-      if (base64 === undefined) {
-        if (this.track) {
-          this.history.splice(this.idx, 1);
+      if (!(await window.ipc.trackExistsOnDisk(toRaw(track)))) {
+        const stream_url = await window.ipc.getStreamingURL(toRaw(track));
+        if (stream_url === undefined) {
+          Notify.create({
+            type: 'negative',
+            message: 'Failed to get streaming URL for track',
+          });
+          return;
         }
-        Notify.create({
-          type: 'negative',
-          message: 'Failed to load the track from disk',
-        });
-        return;
-      }
+        track.stream_url = stream_url;
+        this.audio.src = stream_url;
+        this.loaded = true;
+      } else {
+        const base64 = await window.ipc.loadAudioFile(toRaw(track));
+        if (base64 === undefined) {
+          if (this.track) {
+            this.history.splice(this.idx, 1);
+          }
+          Notify.create({
+            type: 'negative',
+            message: 'Failed to load the track from disk',
+          });
+          return;
+        }
 
-      this.audio.src = 'data:audio/mp3;base64,' + base64;
-      this.loaded = true;
+        this.audio.src = 'data:audio/mp3;base64,' + base64;
+        this.loaded = true;
+      }
 
       // If the store was just loaded from localStorage, and there was currentTime set, restore it
       if (this.initialLoad && this.track?.id === track.id) {

@@ -14,10 +14,16 @@
       <q-item>
         <q-item-section>
           <q-item-label
-            class="tw-cursor-pointer"
+            class="tw-cursor-pointer tw-flex tw-justify-start tw-gap-2"
             @click="openTrackAlbum(player.track)"
-            >{{ player.track.name }}</q-item-label
           >
+            {{ player.track.name }}
+            <q-icon
+              v-if="player.track.stream_url"
+              name="o_cloud"
+              title="Streamed from YouTube"
+            />
+          </q-item-label>
           <q-item-label caption>{{
             joinArtistNames(player.track.artists || [], ', ')
           }}</q-item-label>
