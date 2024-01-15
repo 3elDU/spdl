@@ -60,13 +60,13 @@
 
 <script setup lang="ts">
 import { QTableColumn } from 'quasar';
-import TrackDownloadProgress from './TrackDownloadProgress.vue';
+import TrackDownloadProgress from './track/TrackDownloadProgress.vue';
 import { useQueueStore } from 'src/stores/queue';
 import { ref, toRaw } from 'vue';
-import { formatTrackAuthors, formatTrackDuration } from 'src/util/util';
+import { formatTrackAuthors, formatTrackDuration } from 'src/util';
 import { storeToRefs } from 'pinia';
 import { SPDL } from 'app/types';
-import TrackAlbumCover from './TrackAlbumCover.vue';
+import TrackAlbumCover from './track/TrackAlbumCover.vue';
 
 const showDownloadNowButton = ref(false);
 function downloadNow(queueItem: SPDL.Queue.Item) {

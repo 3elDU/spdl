@@ -3,8 +3,8 @@ import path from 'path';
 import os from 'os';
 import registerIPCHandlers from './ipc';
 import { preferences } from './store';
-import { queue } from './download/queue';
-import { initQueueWorker } from './download/worker';
+import { queue } from 'app/core/queue';
+import { initQueueWorker } from 'app/core/worker';
 
 // needed in case process is undefined under Linux
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

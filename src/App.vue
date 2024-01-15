@@ -6,10 +6,10 @@
 
 <script setup lang="ts">
 import { toRaw } from 'vue';
-import { usePreferencesStore } from './stores/preferences';
-import { useSpotifyAPIStore } from './stores/spotify';
-import { useQueueStore } from './stores/queue';
-import { setupSyncJob } from './sync/sync';
+import { usePreferencesStore } from 'src/stores/preferences';
+import { useSpotifyAPIStore } from 'src/stores/spotify';
+import { useQueueStore } from 'src/stores/queue';
+import { setupSyncJob } from 'src/sync';
 import { Notify } from 'quasar';
 
 const queue = useQueueStore();

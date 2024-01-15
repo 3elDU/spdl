@@ -4,7 +4,7 @@ import { basename, dirname, join } from 'path';
 import MP3Tag from 'mp3tag.js';
 import YTDlpWrap from 'yt-dlp-wrap';
 import ffmpegPath from 'ffmpeg-static';
-import { preferences } from '../store';
+import { preferences } from 'app/src-electron/store';
 import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
@@ -100,9 +100,6 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
     });
     return;
   }
-
-  const info = await YouTube.getVideo(closestMatch);
-  console.log(info);
 
   // When the app is packages for ASAR format, ffmpeg-static points to the wrong path
   const ffmpeg = ffmpegPath.replace('app.asar', 'app.asar.unpacked');

@@ -52,29 +52,27 @@ export const usePlayerStore = defineStore('player', {
   },
 
   actions: {
-    async playTrack(track: SPDL.Track) {
-      if (this.audio === undefined) {
-        return;
+    // Fetch the track data and put in in the audio's `src` property
+    async _fetchTrack(track: SPDL.Track): Promise<boolean> {
+      if (!this.audio) {
+        return false;
       }
 
-      // If currently played track ID is the same as requested track id,
-      // just resume the playback
-      if (this.loaded && this.track?.id === track.id) {
-        await this.play();
-        return;
-      }
-
+      // If track doesn't exist on the disk, stream it from YouTube
       if (!(await window.ipc.trackExistsOnDisk(toRaw(track)))) {
-        const stream_url = await window.ipc.getStreamingURL(toRaw(track));
-        if (stream_url === undefined) {
-          Notify.create({
-            type: 'negative',
-            message: 'Failed to get streaming URL for track',
-          });
-          return;
+        // Skip fetching streaming URL, if it is already set
+        if (track.stream_url === undefined) {
+          const stream_url = await window.ipc.getStreamingURL(toRaw(track));
+          if (stream_url === undefined) {
+            Notify.create({
+              type: 'negative',
+              message: 'Failed to get streaming URL for track',
+            });
+            return false;
+          }
+          track.stream_url = stream_url;
         }
-        track.stream_url = stream_url;
-        this.audio.src = stream_url;
+        this.audio.src = track.stream_url;
         this.loaded = true;
       } else {
         const base64 = await window.ipc.loadAudioFile(toRaw(track));
@@ -86,23 +84,16 @@ export const usePlayerStore = defineStore('player', {
             type: 'negative',
             message: 'Failed to load the track from disk',
           });
-          return;
+          return false;
         }
 
         this.audio.src = 'data:audio/mp3;base64,' + base64;
         this.loaded = true;
       }
 
-      // If the store was just loaded from localStorage, and there was currentTime set, restore it
-      if (this.initialLoad && this.track?.id === track.id) {
-        this.audio.currentTime = this.currentTime;
-        this.initialLoad = false;
-      }
-
-      // Add track to history, if the function was called externally
-      this.history[this.idx] = track;
-      await this.play();
-
+      return true;
+    },
+    _updateMediaSession(track: SPDL.Track) {
       const images: MediaImage[] = [];
       if (track.album.cover) {
         images.push({
@@ -121,6 +112,35 @@ export const usePlayerStore = defineStore('player', {
         artwork: images,
       });
       navigator.mediaSession.playbackState = 'playing';
+    },
+
+    async playTrack(track: SPDL.Track) {
+      if (this.audio === undefined) {
+        return;
+      }
+
+      // If currently played track ID is the same as requested track id,
+      // just resume the playback
+      if (this.loaded && this.track?.id === track.id) {
+        await this.play();
+        return;
+      }
+
+      if (!(await this._fetchTrack(track))) {
+        return;
+      }
+
+      // If the store was just loaded from localStorage, and there was currentTime set, restore it
+      if (this.initialLoad && this.track?.id === track.id) {
+        this.audio.currentTime = this.currentTime;
+        this.initialLoad = false;
+      }
+
+      // Add track to history, if the function was called externally
+      this.history[this.idx] = track;
+
+      this._updateMediaSession(track);
+      await this.play();
     },
     async playFromIndex(idx: number) {
       const track = this.history.at(idx);

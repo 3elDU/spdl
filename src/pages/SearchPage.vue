@@ -45,11 +45,11 @@
 
 <script setup lang="ts">
 import { QTableColumn } from 'quasar';
-import SearchComponent from 'src/components/SearchComponent.vue';
-import TrackDownloadProgress from 'src/components/TrackDownloadProgress.vue';
-import TrackAlbumCover from 'src/components/TrackAlbumCover.vue';
+import SearchComponent from 'src/components/inputs/SearchComponent.vue';
+import TrackDownloadProgress from 'src/components/track/TrackDownloadProgress.vue';
+import TrackAlbumCover from 'src/components/track/TrackAlbumCover.vue';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
-import { formatTrackDuration } from 'src/util/util';
+import { formatTrackDuration } from 'src/util';
 import { Ref, ref } from 'vue';
 import { SPDL } from 'app/types';
 import { fromSpotifyTrack } from 'app/types/convert';

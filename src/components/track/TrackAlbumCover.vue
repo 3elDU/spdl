@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { Buffer } from 'buffer';
-import InlineTrackPlayButton from './InlineTrackPlayButton.vue';
+import InlineTrackPlayButton from 'components/track/InlineTrackPlayButton.vue';
 import { SPDL } from 'app/types';
 import { ref } from 'vue';
 

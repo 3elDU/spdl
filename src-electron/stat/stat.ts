@@ -1,12 +1,6 @@
+import LibraryStats from 'app/types/stat';
 import { readdir, stat } from 'fs/promises';
 import { extname, join } from 'path';
-
-export interface LibraryStats {
-  // Amount of tracks in the library
-  tracks: number;
-  // Size of the library in megabytes
-  sizeMB: number;
-}
 
 // Count the number of .mp3 files, and their total size in the specified directory
 export async function statLibrary(directory: string): Promise<LibraryStats> {

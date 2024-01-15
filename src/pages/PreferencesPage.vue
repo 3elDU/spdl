@@ -5,7 +5,7 @@
         outlined
         class="tw-flex-grow tw-max-w-xs"
         label="Base directory for saving music"
-        :options="availableMusicDirectories"
+        :options="preferences.availableMusicDirectories"
         :model-value="preferences.preferences.musicDirectory"
         @update:model-value="
           (value) => {
@@ -78,17 +78,11 @@
 <script setup lang="ts">
 import { Notify } from 'quasar';
 import { usePreferencesStore } from 'src/stores/preferences';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 
 const preferences = usePreferencesStore();
 const parallelDownloadingLimit = ref(
   preferences.preferences.parallelDownloadingLimit
-);
-
-const availableMusicDirectories = computed(() =>
-  [preferences.preferences.musicDirectory].concat(
-    preferences.preferences.previousMusicDirectories
-  )
 );
 
 async function chooseMusicFolder() {

@@ -62,9 +62,9 @@
 
 <script setup lang="ts">
 import { usePlayerStore } from 'src/stores/player';
-import { formatTrackAuthors } from 'src/util/util';
-import TrackAlbumCover from 'components/TrackAlbumCover.vue';
-import DynamicTrackIndex from 'components/DynamicTrackIndex.vue';
+import { formatTrackAuthors } from 'src/util';
+import TrackAlbumCover from 'components/track/TrackAlbumCover.vue';
+import DynamicTrackIndex from 'components/track/DynamicTrackIndex.vue';
 import { Ref, ref } from 'vue';
 import { QItem } from 'quasar';
 

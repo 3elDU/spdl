@@ -18,7 +18,7 @@
 import { useElementHover } from '@vueuse/core';
 import { SPDL } from 'app/types';
 import { computed, ref } from 'vue';
-import InlineTrackPlayButton from './InlineTrackPlayButton.vue';
+import InlineTrackPlayButton from 'components/track/InlineTrackPlayButton.vue';
 import { usePlayerStore } from 'src/stores/player';
 
 const player = usePlayerStore();

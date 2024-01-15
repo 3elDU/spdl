@@ -1,15 +1,15 @@
 import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
-import { calculateTrackPath, downloadTrack } from './download/downloader';
+import { calculateTrackPath, downloadTrack } from 'app/core/downloader';
 import { preferences, UserPreferences } from './store';
 import { existsSync } from 'fs';
-import { queue } from './download/queue';
-import { downloadTrackQueued } from './download/worker';
+import { queue } from 'app/core/queue';
+import { downloadTrackQueued } from 'app/core/worker';
 import { statLibrary } from './stat/stat';
 import localSearch from './search';
 import { readFile } from 'fs/promises';
 import { SPDL } from 'app/types';
 import initAuthServer from './auth';
-import { getTrackStreamURL } from './download/stream';
+import { getTrackStreamURL } from 'app/core/stream';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {

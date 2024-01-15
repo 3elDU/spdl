@@ -1,5 +1,5 @@
 import { SPDL } from 'app/types';
-import { preferences } from '../store';
+import { preferences } from 'app/src-electron/store';
 import { downloadTrack, downloadYTDLP } from './downloader';
 import { queue } from './queue';
 

@@ -1,5 +1,5 @@
+import LibraryStats from 'app/types/stat';
 import { UserPreferences } from './store';
-import { LibraryStats } from './stat/stat';
 import { SPDL } from 'app/types';
 
 interface ElectronIPC {

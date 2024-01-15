@@ -38,18 +38,10 @@ const buttonIcon = computed(() => {
 });
 
 async function click() {
-  const track = structuredClone(toRaw(props.track));
-
-  let streamingURL: string | undefined = undefined;
-  if (!track.stream_url && !existsOnDisk.value) {
-    streamingURL = await window.ipc.getStreamingURL(toRaw(props.track));
-    track.stream_url = streamingURL;
-  }
-
   if (player.track?.id === props.track.id && !player.paused) {
     player.pause();
   } else if (shiftPressed.value) {
-    player.addToQueue(track);
+    player.addToQueue(props.track);
   } else {
     const trackIdx = player.history.findIndex(
       (track) => props.track.id === track.id
@@ -58,7 +50,7 @@ async function click() {
     if (props.switchToIndex && trackIdx !== -1) {
       player.playFromIndex(trackIdx);
     } else {
-      player.playTrack(track);
+      player.playTrack(props.track);
     }
   }
 }
