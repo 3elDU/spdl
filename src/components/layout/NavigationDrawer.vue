@@ -29,14 +29,14 @@
 <script setup lang="ts">
 import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const model = defineModel<boolean>({ default: false });
 
 const drawerMinified = ref(true);
 
 const { authenticated } = storeToRefs(useSpotifyAPIStore());
-const destinations = [
+const destinations = computed(() => [
   { type: 'item', icon: 'home', label: 'Home', to: '/' },
   { type: 'item', icon: 'search', label: 'Search', to: '/search' },
   { type: 'item', icon: 'library_music', label: 'Library', to: '/library' },
@@ -50,5 +50,5 @@ const destinations = [
     class: authenticated.value ? '' : 'text-negative',
   },
   { type: 'item', icon: 'settings', label: 'Settings', to: '/settings' },
-];
+]);
 </script>

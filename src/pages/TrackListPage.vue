@@ -60,12 +60,14 @@ async function loadTracks() {
       props.id as string
     );
     playlistOrAlbum.value = playlist;
+
     items = playlist.tracks.items
       .filter((item) => item.track.type == 'track')
       .map((item) => fromSpotifyTrack(item.track as Track));
   } else {
     const album = await spotify.api.albums.get(props.id as string, undefined);
     playlistOrAlbum.value = album;
+
     items = album.tracks.items.map((item) => {
       // SimplifiedTrack type is missing the 'album' property, but it is required
       // in the convertation process, so we assign it

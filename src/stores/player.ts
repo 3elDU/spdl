@@ -58,23 +58,7 @@ export const usePlayerStore = defineStore('player', {
         return false;
       }
 
-      // If track doesn't exist on the disk, stream it from YouTube
-      if (!(await window.ipc.trackExistsOnDisk(toRaw(track)))) {
-        // Skip fetching streaming URL, if it is already set
-        if (track.stream_url === undefined) {
-          const stream_url = await window.ipc.getStreamingURL(toRaw(track));
-          if (stream_url === undefined) {
-            Notify.create({
-              type: 'negative',
-              message: 'Failed to get streaming URL for track',
-            });
-            return false;
-          }
-          track.stream_url = stream_url;
-        }
-        this.audio.src = track.stream_url;
-        this.loaded = true;
-      } else {
+      if (track.src || (await window.ipc.trackExistsOnDisk(toRaw(track)))) {
         const base64 = await window.ipc.loadAudioFile(toRaw(track));
         if (base64 === undefined) {
           if (this.track) {
@@ -88,6 +72,23 @@ export const usePlayerStore = defineStore('player', {
         }
 
         this.audio.src = 'data:audio/mp3;base64,' + base64;
+        this.loaded = true;
+      } else {
+        // If track doesn't exist on the disk, stream it from YouTube
+
+        // Skip fetching streaming URL, if it is already set
+        if (track.stream_url === undefined) {
+          const stream_url = await window.ipc.getStreamingURL(toRaw(track));
+          if (stream_url === undefined) {
+            Notify.create({
+              type: 'negative',
+              message: 'Failed to get streaming URL for track',
+            });
+            return false;
+          }
+          track.stream_url = stream_url;
+        }
+        this.audio.src = track.stream_url;
         this.loaded = true;
       }
 
@@ -157,6 +158,11 @@ export const usePlayerStore = defineStore('player', {
         return;
       }
 
+      // Pause the currently playing track when switching
+      if (this.loaded && !this.paused) {
+        await this.pause();
+      }
+
       this.idx++;
       this.loaded = false;
       if (this.track) {
@@ -166,6 +172,11 @@ export const usePlayerStore = defineStore('player', {
     async playPrevious() {
       if (!this.hasPreviousItems) {
         return;
+      }
+
+      // Pause the currently playing track when switching
+      if (this.loaded && !this.paused) {
+        await this.pause();
       }
 
       this.idx--;

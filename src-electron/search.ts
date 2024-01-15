@@ -1,6 +1,6 @@
 import { readFile, readdir, stat } from 'fs/promises';
 import MP3Tag from 'mp3tag.js';
-import { basename, extname, join } from 'path';
+import { extname, join } from 'path';
 import { preferences } from './store';
 import Fuse from 'fuse.js';
 import { SPDL } from 'app/types';
@@ -17,18 +17,23 @@ async function loadMetadata(filename: string): Promise<SPDL.Track> {
       Buffer.from(mp3tag.tags.v2.APIC.at(0).data)
     : undefined;
 
-  // Extract ID from the filename.
-  // I guess there is a better way to do it, but it works.
-  const id = basename(filename).split('_').at(-1)?.replace('.mp3', '');
-  if (id === undefined) {
-    throw new Error('ID is undefined');
+  const spotify_ids_text = mp3tag.tags.v2?.['TXXX']?.find(
+    (value) => value.description === 'spotify_ids'
+  );
+  if (spotify_ids_text === undefined) {
+    throw new Error("No 'spotify_ids' property in metadata");
   }
+  const spotify_ids: {
+    track_id: string;
+    album_id: string;
+  } = JSON.parse(spotify_ids_text.text);
 
   return {
-    id,
+    id: spotify_ids.track_id,
     src: filename,
     name: mp3tag.tags.title,
     album: {
+      id: spotify_ids.album_id,
       name: mp3tag.tags.album,
       release_year: Number.parseInt(mp3tag.tags.year),
       cover: albumCover,

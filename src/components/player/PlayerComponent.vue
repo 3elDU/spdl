@@ -63,9 +63,7 @@
 
 <script setup lang="ts">
 import { usePlayerStore } from 'src/stores/player';
-import TrackAlbumCover from 'components/track/TrackAlbumCover.vue';
 import { Ref, onMounted, ref } from 'vue';
-import { joinArtistNames } from 'app/types/util';
 import { useThrottleFn } from '@vueuse/core';
 import MusicQueueMenu from 'components/queue/MusicQueueMenu.vue';
 import PlayerControls from './PlayerControls.vue';

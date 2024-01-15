@@ -14,6 +14,9 @@
           @click="drawerOpen = !drawerOpen"
         />
 
+        <GoBackButton />
+        <GoForwardButton />
+
         <q-toolbar-title>
           {{ route.meta.title }}
         </q-toolbar-title>
@@ -40,6 +43,8 @@ import PlayerComponent from 'components/player/PlayerComponent.vue';
 import { useRoute } from 'vue-router';
 import NavigationDrawer from 'src/components/layout/NavigationDrawer.vue';
 import { ref } from 'vue';
+import GoBackButton from 'src/components/layout/GoBackButton.vue';
+import GoForwardButton from 'src/components/layout/GoForwardButton.vue';
 
 const drawerOpen = ref(true);
 

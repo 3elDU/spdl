@@ -9,7 +9,6 @@ import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
 import { assembleSearchQuery, findClosestMatch, searchYT } from './search';
-import YouTube from 'youtube-sr';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -183,6 +182,16 @@ async function embedMetadata(path: string, track: SPDL.Track) {
           format: 'image/jpeg',
           description: 'Cover',
           data: albumCoverData,
+        },
+      ];
+
+      mp3tag.tags.v2['TXXX'] = [
+        {
+          description: 'spotify_ids',
+          text: JSON.stringify({
+            track_id: track.id,
+            album_id: track.album.id,
+          }),
         },
       ];
     }
