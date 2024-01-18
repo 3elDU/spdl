@@ -21,6 +21,7 @@ div.q-page {
 
 ::-webkit-scrollbar {
   width: 8px;
+  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -28,7 +29,7 @@ div.q-page {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.15);
   border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {

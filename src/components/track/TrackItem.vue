@@ -12,25 +12,15 @@
 
     <q-item-section>
       <q-item-label>
-        {{ track.name }}
+        <TrackTitle :track="track" />
       </q-item-label>
       <q-item-label caption>
-        {{ formatTrackAuthors(track) }}
+        <TrackArtists :artists="track.artists" />
       </q-item-label>
     </q-item-section>
 
     <q-item-section v-if="showAlbumName">
-      <RouterLink
-        :to="{
-          name: 'tracklist',
-          params: {
-            type: 'album',
-            id: track.album.id,
-          },
-        }"
-      >
-        {{ track.album.name }}
-      </RouterLink>
+      <TrackAlbum :album="track.album" />
     </q-item-section>
 
     <q-item-section side v-if="showDuration">
@@ -47,7 +37,10 @@ import { SPDL } from 'app/types';
 import DynamicTrackIndex from 'components/track/DynamicTrackIndex.vue';
 import TrackAlbumCover from 'components/track/TrackAlbumCover.vue';
 import TrackDownloadProgress from 'components/track/TrackDownloadProgress.vue';
-import { formatTrackAuthors, formatTrackDuration } from 'src/util';
+import { formatTrackDuration } from 'src/util';
+import TrackAlbum from '../links/TrackAlbum.vue';
+import TrackArtists from '../links/TrackArtists.vue';
+import TrackTitle from '../links/TrackTitle.vue';
 
 defineProps<{
   track: SPDL.Track;

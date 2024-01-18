@@ -19,6 +19,7 @@ export declare namespace SPDL {
   }
 
   export interface Artist {
+    id: string;
     name: string;
   }
 

@@ -4,7 +4,7 @@
     but when hovered, shows a play button
   -->
 
-  <q-item-section side ref="item" class="tw-w-[4rem] tw-flex tw-items-center">
+  <q-item-section side ref="item" class="tw-w-[3rem] tw-flex tw-items-center">
     <inline-track-play-button
       :track="track"
       v-if="hovered || isPlaying"

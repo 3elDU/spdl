@@ -23,9 +23,11 @@
         <q-td :props="props">
           <q-item>
             <q-item-section>
-              <q-item-label>{{ props.value }}</q-item-label>
+              <q-item-label>
+                <TrackTitle :track="props.row" />
+              </q-item-label>
               <q-item-label caption>
-                {{ joinArtistNames(props.row.artists, ', ') }}
+                <TrackArtists :artists="props.row.artists" />
               </q-item-label>
             </q-item-section>
           </q-item>
@@ -53,7 +55,8 @@ import { formatTrackDuration } from 'src/util';
 import { Ref, ref } from 'vue';
 import { SPDL } from 'app/types';
 import { fromSpotifyTrack } from 'app/types/convert';
-import { joinArtistNames } from 'app/types/util';
+import TrackTitle from 'src/components/links/TrackTitle.vue';
+import TrackArtists from 'src/components/links/TrackArtists.vue';
 
 const tracks: Ref<SPDL.Track[]> = ref([]);
 

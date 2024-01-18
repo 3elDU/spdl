@@ -1,13 +1,11 @@
 <template>
   <!-- A page for displaying a list of tracks, such as a playlist or an album -->
   <div class="tw-w-full tw-flex tw-flex-col tw-justify-center tw-items-center">
-    <div class="tw-w-full tw-px-36 tw-py-16 bg-grey-2">
-      <BigAlbumOrPlaylistCard
-        :loading="loading"
-        :type="type"
-        :item="playlistOrAlbum"
-      />
-    </div>
+    <BigAlbumOrPlaylistCard
+      :loading="loading"
+      :type="type"
+      :item="playlistOrAlbum"
+    />
 
     <q-separator class="tw-w-full" />
 

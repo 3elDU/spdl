@@ -4,34 +4,25 @@
     <q-item>
       <q-item-section>
         <q-item-label class="tw-flex tw-justify-start tw-gap-2">
-          <RouterLink
-            :to="{
-              name: 'tracklist',
-              params: {
-                type: 'album',
-                id: player.track.album.id,
-              },
-            }"
-          >
-            {{ player.track.name }}
-          </RouterLink>
+          <TrackTitle :track="player.track" />
           <q-icon
             v-if="player.track.stream_url"
             name="o_cloud"
             title="Streamed from YouTube"
           />
         </q-item-label>
-        <q-item-label caption>{{
-          joinArtistNames(player.track.artists || [], ', ')
-        }}</q-item-label>
+        <q-item-label caption>
+          <TrackArtists :artists="player.track.artists" />
+        </q-item-label>
       </q-item-section>
     </q-item>
   </div>
 </template>
 
 <script setup lang="ts">
-import { joinArtistNames } from 'app/types/util';
 import { usePlayerStore } from 'src/stores/player';
+import TrackArtists from '../links/TrackArtists.vue';
+import TrackTitle from '../links/TrackTitle.vue';
 import TrackAlbumCover from '../track/TrackAlbumCover.vue';
 
 const player = usePlayerStore();

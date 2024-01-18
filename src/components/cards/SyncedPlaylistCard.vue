@@ -14,7 +14,7 @@
       <q-card-section class="tw-overflow-hidden">
         <RouterLink
           v-if="playlist.name"
-          class="text-h6 tw-truncate"
+          class="text-h6"
           :title="playlist.name"
           :to="{
             name: 'tracklist',
@@ -24,7 +24,9 @@
             },
           }"
         >
-          {{ playlist.name }}
+          <div class="tw-truncate">
+            {{ playlist.name }}
+          </div>
         </RouterLink>
         <div v-else class="text-h6 tw-truncate text-grey">No name</div>
 

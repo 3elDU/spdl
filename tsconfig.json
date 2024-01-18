@@ -3,6 +3,8 @@
   "compilerOptions": {
     "strict": true,
     "baseUrl": ".",
-    "types": ["@types/node"]
+    "types": [
+      "@types/node"
+    ]
   }
 }

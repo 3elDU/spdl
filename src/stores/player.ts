@@ -135,6 +135,8 @@ export const usePlayerStore = defineStore('player', {
       if (this.initialLoad && this.track?.id === track.id) {
         this.audio.currentTime = this.currentTime;
         this.initialLoad = false;
+      } else {
+        this.audio.currentTime = 0;
       }
 
       // Add track to history, if the function was called externally
@@ -148,7 +150,6 @@ export const usePlayerStore = defineStore('player', {
       if (track) {
         this.idx = idx;
         this.loaded = false;
-        this.currentTime = 0;
         this.playTrack(track);
       }
     },

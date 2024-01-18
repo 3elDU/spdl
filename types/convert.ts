@@ -13,6 +13,7 @@ export function fromSpotifyTrack(track: Track): SPDL.Track {
       release_year: new Date(track.album.release_date).getFullYear(),
     },
     artists: track.artists.map((artist) => ({
+      id: artist.id,
       name: artist.name,
     })),
     duration: track.duration_ms / 1000.0,

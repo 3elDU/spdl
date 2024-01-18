@@ -40,6 +40,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/TrackListPage.vue'),
       },
       {
+        path: 'artist/:id',
+        name: 'artist',
+        props: true,
+        component: () => import('pages/ArtistPage.vue'),
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('pages/PreferencesPage.vue'),
