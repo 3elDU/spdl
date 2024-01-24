@@ -5,9 +5,10 @@
   -->
 
   <q-item-section side ref="item" class="tw-w-[3rem] tw-flex tw-items-center">
+    <q-skeleton v-if="loading" type="text" width="1rem" />
     <inline-track-play-button
+      v-else-if="track && (hovered || isPlaying)"
       :track="track"
-      v-if="hovered || isPlaying"
       :switch-to-index="switchToIndex"
     />
     <q-item-label v-else>{{ props.index + 1 }}</q-item-label>
@@ -24,8 +25,9 @@ import { usePlayerStore } from 'src/stores/player';
 const player = usePlayerStore();
 
 const props = defineProps<{
+  loading?: boolean;
   index: number;
-  track: SPDL.Track;
+  track?: SPDL.Track;
   // Passed down to <inline-track-play-button>
   switchToIndex?: boolean;
 }>();
@@ -35,6 +37,6 @@ const hovered = useElementHover(item);
 
 // Show a pause button when the track is already playing
 const isPlaying = computed(
-  () => player.track?.id === props.track.id && !player.paused
+  () => player.track?.id === props.track!.id && !player.paused
 );
 </script>

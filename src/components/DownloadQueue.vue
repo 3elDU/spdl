@@ -2,11 +2,11 @@
   <div>
     <div class="row justify-between items-center">
       <div class="text-h5">Download queue</div>
-      <q-input v-model="filter" label="Filter" class="tw-w-1/3"></q-input>
+      <q-input v-model="filter" label="Filter" class="tw-w-1/3" outlined />
     </div>
   </div>
 
-  <q-table :rows="items" :columns="columns" :filter="filter" flat>
+  <q-table :rows="items" :columns="columns" :filter="filter" flat bordered>
     <template v-slot:body-cell-album="props">
       <q-td :props="props">
         <TrackAlbumCover

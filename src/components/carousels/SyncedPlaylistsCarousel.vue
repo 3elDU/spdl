@@ -34,9 +34,8 @@
               class="text-h6 tw-font-normal tw-truncate"
               :title="playlist.name"
               :to="{
-                name: 'tracklist',
+                name: 'playlist',
                 params: {
-                  type: 'playlist',
                   id: playlist.id,
                 },
               }"

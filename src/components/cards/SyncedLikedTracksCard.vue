@@ -6,7 +6,9 @@
       </q-avatar>
 
       <q-card-section class="tw-overflow-hidden">
-        <div class="text-h6 tw-truncate">Liked songs</div>
+        <RouterLink class="text-h6 tw-truncate" to="favourites"
+          >Liked songs</RouterLink
+        >
         <div class="text-subtitle2">{{ likedTracksCount }} Tracks</div>
       </q-card-section>
 

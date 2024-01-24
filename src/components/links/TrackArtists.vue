@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="tw-truncate">
     <span v-for="artist in artists" :key="artist.id">
       <RouterLink
         :to="{

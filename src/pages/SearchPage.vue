@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="column q-px-xl q-gutter-xl">
+  <q-page padding class="tw-flex tw-flex-col tw-px-12 tw-gap-12">
     <SearchComponent
       :initial-query="query"
       :initial-search-local-option="performLocalSearch"

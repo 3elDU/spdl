@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="q-px-xl column q-gutter-md">
+  <q-page padding class="tw-flex tw-flex-col tw-gap-4">
     <SearchComponent @search="search" />
 
     <div class="tw-flex tw-flex-row tw-gap-4">
@@ -8,7 +8,7 @@
       <SyncedPlaylistsCarousel />
     </div>
 
-    <DownloadQueue />
+    <DownloadQueue v-if="queue.items.length" />
   </q-page>
 </template>
 
@@ -25,9 +25,11 @@ import LibraryTracksCountCard from 'components/cards/LibraryTracksCountCard.vue'
 import DownloadQueue from 'src/components/DownloadQueue.vue';
 import SyncedPlaylistsCarousel from 'src/components/carousels/SyncedPlaylistsCarousel.vue';
 import SearchComponent from 'src/components/inputs/SearchComponent.vue';
+import { useQueueStore } from 'src/stores/queue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
+const queue = useQueueStore();
 
 function search(query: string, searchLocal: boolean) {
   // Open the search page with the entered values

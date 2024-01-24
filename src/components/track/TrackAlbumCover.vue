@@ -1,19 +1,24 @@
 <template>
   <q-avatar
     :size="size"
-    class="tw-flex tw-justify-center tw-items-center tw-relative"
+    rounded
+    class="tw-flex tw-justify-center tw-items-center tw-relative tw-bg-neutral-400"
     @mouseenter="mouseHovering = true"
     @mouseleave="mouseHovering = false"
   >
-    <q-img
+    <img
       v-if="track.album.cover"
       :src="bufferToImage(track.album.cover)"
-      class="tw-absolute tw-rounded"
+      class="tw-absolute"
+      loading="lazy"
+      decoding="async"
     />
-    <q-img
+    <img
       v-else-if="track.album.cover_url"
       :src="track.album.cover_url"
       class="tw-absolute tw-rounded"
+      loading="lazy"
+      decoding="async"
     />
     <div
       v-else
@@ -45,6 +50,7 @@ withDefaults(
     showPlayButton?: boolean;
   }>(),
   {
+    size: '40px',
     showPlayButton: false,
   }
 );

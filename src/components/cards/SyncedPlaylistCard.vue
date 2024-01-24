@@ -17,9 +17,8 @@
           class="text-h6"
           :title="playlist.name"
           :to="{
-            name: 'tracklist',
+            name: 'playlist',
             params: {
-              type: 'playlist',
               id: playlist.id,
             },
           }"

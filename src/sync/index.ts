@@ -1,13 +1,9 @@
 import { Page, PlaylistedTrack, SavedTrack } from '@spotify/web-api-ts-sdk';
+import { transformNextURL } from 'src/util';
 import { fromSpotifyTrack } from 'app/types/convert';
 import { storeToRefs } from 'pinia';
 import { usePreferencesStore } from 'src/stores/preferences';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
-
-function transformNextURL(fullURL: string): string {
-  const url = new URL(fullURL);
-  return url.pathname.replace('/v1/', '') + url.search;
-}
 
 export async function syncLikedTracks() {
   console.log('Syncing liked tracks');

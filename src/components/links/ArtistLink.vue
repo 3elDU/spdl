@@ -2,7 +2,7 @@
   <q-item>
     <q-item-section avatar>
       <q-avatar class="shadow-5">
-        <q-img :src="artist.images.at(0)?.url" />
+        <img :src="artist.images.at(0)?.url" />
       </q-avatar>
     </q-item-section>
 

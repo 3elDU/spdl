@@ -2,12 +2,15 @@
   <q-drawer
     v-model="model"
     :mini="drawerMinified"
+    mini-to-overlay
     @mouseover="drawerMinified = false"
     @mouseout="drawerMinified = true"
-    bordered
     :width="200"
     :breakpoint="500"
-    class="bg-grey-3"
+    class="bg-grey-3 tw-border-r tw-transition-all"
+    :class="
+      drawerMinified ? 'tw-border-r-neutral-300' : 'tw-border-r-neutral-400'
+    "
   >
     <q-list>
       <div v-for="(item, i) in destinations" :key="i" :class="item?.class">

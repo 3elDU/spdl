@@ -1,5 +1,9 @@
 <template>
-  <q-page v-if="spotify.authenticated" padding class="q-gutter-md">
+  <q-page
+    v-if="spotify.authenticated"
+    padding
+    class="tw-flex tw-flex-col tw-gap-4"
+  >
     <q-item
       class="tw-border tw-border-[--q-positive] bg-green-2 rounded-borders"
     >
@@ -14,7 +18,7 @@
 
     <q-btn color="negative" label="Log out" @click="spotify.logOut()" />
   </q-page>
-  <q-page v-else padding class="q-gutter-md">
+  <q-page v-else padding class="tw-flex tw-flex-col tw-gap-4">
     <q-item
       v-if="spotify.clientID === undefined"
       class="tw-border tw-border-[--q-warning] bg-orange-2 rounded-borders"

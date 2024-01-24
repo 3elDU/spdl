@@ -1,8 +1,9 @@
 <template>
   <div
-    class="tw-w-full tw-px-36 tw-py-16 bg-grey-2 tw-flex tw-justify-center tw-flex-wrap tw-gap-8"
+    class="tw-w-full tw-px-36 tw-py-16 bg-grey-2 tw-flex tw-justify-center tw-flex-wrap tw-gap-8 tw-border-b tw-border-neutral-300"
   >
-    <q-skeleton v-if="loading" size="192px" sqaure class="tw-rounded-md" />
+    <q-skeleton v-if="loading" size="192px" sqaure class="tw-rounded" />
+    <slot v-else-if="$slots.avatar" name="avatar" />
     <q-avatar v-else-if="avatar_src" size="192px" rounded class="shadow-5">
       <img :src="avatar_src" />
     </q-avatar>
@@ -30,6 +31,15 @@
       <div v-if="$slots.artists">
         <slot name="artists" />
       </div>
+
+      <div v-if="$slots.tracksCount" class="text-subtitle2 tw-flex tw-flex-col">
+        <div>
+          <slot name="tracksCount" />
+        </div>
+        <div>
+          <slot name="releaseYear" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -43,8 +53,11 @@ defineProps<{
 
 defineSlots<{
   overline(): unknown;
+  avatar(): unknown;
   title(): unknown;
   description(): unknown;
   artists(): unknown;
+  tracksCount(): unknown;
+  releaseYear(): unknown;
 }>();
 </script>

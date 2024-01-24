@@ -2,7 +2,12 @@
   <div
     class="tw-relative tw-min-h-[80px] tw-pb-2 tw-pt-4 tw-px-4 tw-flex tw-items-center tw-gap-6"
   >
-    <audio ref="audio" @ended="playbackEnded" @timeupdate="updateTime" />
+    <audio
+      ref="audio"
+      @ended="playbackEnded"
+      @timeupdate="updateTime"
+      @error="audioError($event)"
+    />
 
     <PlayerTrackItem />
 
@@ -22,7 +27,7 @@
     </div>
 
     <div
-      class="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-rounded-full tw-bg-neutral-100 tw-px-4 tw-py-1 tw-z-20"
+      class="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-bg-neutral-200 tw-rounded-full tw-px-4 tw-py-1 tw-z-50"
     >
       <PlayerControls />
     </div>
@@ -63,7 +68,7 @@
 
 <script setup lang="ts">
 import { usePlayerStore } from 'src/stores/player';
-import { Ref, onMounted, ref } from 'vue';
+import { Ref, onMounted, ref, toRaw } from 'vue';
 import { useThrottleFn } from '@vueuse/core';
 import MusicQueueMenu from 'components/queue/MusicQueueMenu.vue';
 import PlayerControls from './PlayerControls.vue';
@@ -124,6 +129,25 @@ function playbackEnded() {
     player.pause();
   } else {
     player.playNextFromQueue();
+  }
+}
+
+// Handle errors when loading content in <audio>
+async function audioError(event: Event) {
+  console.log(event);
+
+  if (!player.track) {
+    return;
+  }
+
+  // Try to refresh the streaming URL
+  if (player.track.stream_url) {
+    player.track.stream_url = await window.ipc.getStreamingURL(
+      toRaw(player.track)
+    );
+    await player.playTrack(player.track);
+
+    event.preventDefault();
   }
 }
 

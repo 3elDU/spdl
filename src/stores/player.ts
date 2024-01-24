@@ -58,6 +58,7 @@ export const usePlayerStore = defineStore('player', {
         return false;
       }
 
+      // If track exists on disk, load it from disk
       if (track.src || (await window.ipc.trackExistsOnDisk(toRaw(track)))) {
         const base64 = await window.ipc.loadAudioFile(toRaw(track));
         if (base64 === undefined) {
@@ -88,6 +89,7 @@ export const usePlayerStore = defineStore('player', {
           }
           track.stream_url = stream_url;
         }
+
         this.audio.src = track.stream_url;
         this.loaded = true;
       }

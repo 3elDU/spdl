@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="q-gutter-md">
+  <q-page padding class="tw-flex tw-flex-col tw-gap-4">
     <div class="tw-flex tw-gap-4 tw-items-center">
       <q-select
         outlined

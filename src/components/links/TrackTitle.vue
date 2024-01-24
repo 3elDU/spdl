@@ -1,9 +1,8 @@
 <template>
   <RouterLink
     :to="{
-      name: 'tracklist',
+      name: 'album',
       params: {
-        type: 'album',
         id: track.album.id,
       },
     }"

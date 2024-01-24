@@ -1,14 +1,11 @@
 <template>
-  <q-page v-if="loading" class="tw-flex tw-justify-center tw-items-center">
-    <q-spinner size="64px" />
-  </q-page>
-  <q-page v-else-if="artist">
-    <HeaderCard :avatar_src="artist.images.at(0)?.url">
+  <q-page>
+    <HeaderCard :loading="loading" :avatar_src="artist?.images.at(0)?.url">
       <template v-slot:overline> Artist </template>
-      <template v-slot:title> {{ artist.name }} </template>
+      <template v-slot:title> {{ artist?.name }} </template>
     </HeaderCard>
 
-    <div class="tw-flex tw-flex-col tw-gap-8 tw-p-4">
+    <div v-if="!loading" class="tw-flex tw-flex-col tw-gap-8 tw-p-4">
       <q-card flat bordered>
         <q-card-section>
           <div class="text-h6">Top tracks</div>

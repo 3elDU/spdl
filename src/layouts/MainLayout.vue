@@ -26,9 +26,7 @@
     <NavigationDrawer v-model="drawerOpen" />
 
     <q-page-container>
-      <q-page>
-        <router-view />
-      </q-page>
+      <router-view class="tw-bg-white" />
     </q-page-container>
 
     <q-footer bordered class="tw-bg-white tw-text-black">

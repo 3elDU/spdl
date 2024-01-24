@@ -1,6 +1,12 @@
-import { IRedirectionStrategy, SpotifyApi } from '@spotify/web-api-ts-sdk';
+import {
+  IHandleErrors,
+  IRedirectionStrategy,
+  Page,
+  SpotifyApi,
+} from '@spotify/web-api-ts-sdk';
 import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
+import { transformNextURL } from 'src/util';
 
 const redirectionStrategy: IRedirectionStrategy = {
   async redirect(targetUrl) {
@@ -18,6 +24,36 @@ const redirectionStrategy: IRedirectionStrategy = {
   },
   async onReturnFromRedirect() {
     return;
+  },
+};
+
+const errorHandler: IHandleErrors = {
+  async handleErrors(error): Promise<boolean> {
+    console.error(error);
+    Notify.create({
+      type: 'negative',
+      message: 'Error when calling Spotify API',
+      caption: error.toString(),
+      multiLine: true,
+      timeout: 0,
+      actions: [
+        {
+          label: 'Dismiss',
+          color: 'white',
+          handler() {
+            return;
+          },
+        },
+        {
+          label: 'Refresh',
+          color: 'white',
+          handler() {
+            location.reload();
+          },
+        },
+      ],
+    });
+    return true;
   },
 };
 
@@ -41,7 +77,7 @@ export const useSpotifyAPIStore = defineStore('spotify', {
         clientID ?? '',
         'http://localhost:61624/',
         scopes,
-        { redirectionStrategy }
+        { redirectionStrategy, errorHandler }
       ),
     };
   },
@@ -70,8 +106,24 @@ export const useSpotifyAPIStore = defineStore('spotify', {
           clientID ?? '',
           'http://localhost:61624/',
           scopes,
-          { redirectionStrategy }
+          { redirectionStrategy, errorHandler }
         );
+      }
+    },
+
+    // A utility method to fetch remaining items using the .next property
+    async *fetchNext<Type>(next: string | null | undefined) {
+      while (next) {
+        const page: Page<Type> = await this.api.makeRequest<Page<Type>>(
+          'GET',
+          transformNextURL(next)
+        );
+
+        for (const item of page.items) {
+          yield item;
+        }
+
+        next = page.next;
       }
     },
   },

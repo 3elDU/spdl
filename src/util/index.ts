@@ -34,3 +34,34 @@ export function formatTrackAuthors(track: SPDL.Track): string {
 export function formatDateTime(date: Date): string {
   return date.toLocaleString(navigator.language);
 }
+
+// Acceps different objects, such as spotify's Album or our SPDL.Track
+export function getReleaseYear(obj: {
+  release_date?: string;
+  release_year?: number;
+}): number {
+  if (obj.release_date) {
+    return new Date(obj.release_date).getFullYear();
+  } else if (obj.release_year) {
+    return obj.release_year;
+  } else {
+    throw new Error('none of properties found');
+  }
+}
+
+export function transformNextURL(fullURL: string): string {
+  const url = new URL(fullURL);
+  return url.pathname.replace('/v1/', '') + url.search;
+}
+
+export async function collectGenerator<T>(
+  generator: AsyncIterable<T>
+): Promise<T[]> {
+  const items: T[] = [];
+
+  for await (const item of generator) {
+    items.push(item);
+  }
+
+  return items;
+}

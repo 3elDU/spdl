@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  user-select: none;
+}
+
 /* Display scrollbar for the q-page content, not for the whole page */
 html,
 body,
@@ -15,7 +19,7 @@ div.q-page {
 
 .q-page-container > main.q-page {
   /* viewport height minus header height minus footer size */
-  max-height: calc(100vh - 50px - 104px);
+  height: calc(100vh - 50px - 104px);
   overflow-y: auto;
 }
 
