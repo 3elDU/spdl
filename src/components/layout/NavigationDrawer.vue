@@ -2,15 +2,12 @@
   <q-drawer
     v-model="model"
     :mini="drawerMinified"
-    mini-to-overlay
+    :mini-to-overlay="!Platform.is.win"
     @mouseover="drawerMinified = false"
     @mouseout="drawerMinified = true"
     :width="200"
     :breakpoint="500"
-    class="bg-grey-3 tw-border-r tw-transition-all"
-    :class="
-      drawerMinified ? 'tw-border-r-neutral-300' : 'tw-border-r-neutral-400'
-    "
+    class="tw-bg-neutral-100 dark:tw-bg-neutral-800 tw-border-r tw-transition-all tw-border-neutral-300 dark:tw-border-neutral-500"
   >
     <q-list>
       <div v-for="(item, i) in destinations" :key="i" :class="item?.class">
@@ -33,6 +30,7 @@
 import { useSpotifyAPIStore } from 'src/stores/spotify';
 import { storeToRefs } from 'pinia';
 import { computed, ref } from 'vue';
+import { Platform } from 'quasar';
 
 const model = defineModel<boolean>({ default: false });
 

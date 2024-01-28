@@ -1,4 +1,11 @@
-import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron';
+import {
+  BrowserWindow,
+  app,
+  dialog,
+  ipcMain,
+  nativeTheme,
+  shell,
+} from 'electron';
 import { calculateTrackPath, downloadTrack } from 'app/core/downloader';
 import { preferences, UserPreferences } from './store';
 import { existsSync } from 'fs';
@@ -64,6 +71,13 @@ export default function registerIPCHandlers(window: BrowserWindow) {
       preferences.get('preferences.musicDirectory') as string
     );
   });
+  ipcMain.on(
+    'preferences:setThemePreference',
+    (_event, theme: 'light' | 'dark' | 'system') => {
+      preferences.set('preferences.themePreference', theme);
+      nativeTheme.themeSource = theme;
+    }
+  );
 
   ipcMain.handle('queue:get', () => {
     return queue.getAllItems();

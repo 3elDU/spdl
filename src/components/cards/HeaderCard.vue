@@ -1,10 +1,15 @@
 <template>
   <div
-    class="tw-w-full tw-px-36 tw-py-16 bg-grey-2 tw-flex tw-justify-center tw-flex-wrap tw-gap-8 tw-border-b tw-border-neutral-300"
+    class="tw-w-full tw-px-36 tw-py-16 tw-bg-neutral-100 dark:tw-bg-neutral-800 tw-flex tw-justify-center tw-flex-wrap tw-gap-8 tw-border-b tw-border-neutral-300 dark:tw-border-neutral-500"
   >
     <q-skeleton v-if="loading" size="192px" sqaure class="tw-rounded" />
     <slot v-else-if="$slots.avatar" name="avatar" />
-    <q-avatar v-else-if="avatar_src" size="192px" rounded class="shadow-5">
+    <q-avatar
+      v-else-if="avatar_src"
+      size="192px"
+      rounded
+      class="tw-shadow-md dark:tw-shadow-none dark:tw-outline dark:tw-outline-1 dark:tw-outline-neutral-500"
+    >
       <img :src="avatar_src" />
     </q-avatar>
 

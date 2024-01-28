@@ -19,6 +19,7 @@ interface ElectronIPC {
   ): void;
   chooseMusicDirectory(): Promise<string | undefined>;
   openMusicDirectory(): void;
+  setThemePreference(theme: 'light' | 'dark' | 'system'): void;
 
   downloadTrack(track: SPDL.Track, queued: boolean): void;
   getStreamingURL(track: SPDL.Track): Promise<string | undefined>;

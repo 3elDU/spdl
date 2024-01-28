@@ -16,6 +16,7 @@ module.exports = {
         'last 4 iOS versions',
       ],
     },
+    'tailwindcss/nesting': {},
     tailwindcss: {},
 
     // https://github.com/elchininet/postcss-rtlcss

@@ -2,7 +2,7 @@
   <q-page padding class="tw-flex tw-flex-col tw-gap-4">
     <SearchComponent @search="search" />
 
-    <div class="tw-flex tw-flex-row tw-gap-4">
+    <div class="tw-flex tw-flex-row tw-gap-4 tw-flex-wrap">
       <LibraryTracksCountCard class="tw-flex-grow" />
       <LibrarySizeCard class="tw-flex-grow" />
       <SyncedPlaylistsCarousel />

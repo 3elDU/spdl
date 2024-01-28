@@ -5,7 +5,7 @@
     class="tw-flex tw-flex-col tw-gap-4"
   >
     <q-item
-      class="tw-border tw-border-[--q-positive] bg-green-2 rounded-borders"
+      class="tw-border tw-border-[--q-positive] tw-bg-green-200 dark:tw-bg-green-950 rounded-borders"
     >
       <q-item-section avatar>
         <q-icon name="o_check_circle" />
@@ -21,7 +21,7 @@
   <q-page v-else padding class="tw-flex tw-flex-col tw-gap-4">
     <q-item
       v-if="spotify.clientID === undefined"
-      class="tw-border tw-border-[--q-warning] bg-orange-2 rounded-borders"
+      class="tw-border tw-border-[--q-warning] tw-bg-orange-200 dark:tw-bg-orange-950 rounded-borders"
     >
       <q-item-section avatar>
         <q-icon name="o_warning" />
@@ -48,7 +48,7 @@
     </q-item>
 
     <q-item
-      class="tw-border tw-border-[--q-info] bg-light-blue-2 rounded-borders"
+      class="tw-border tw-border-[--q-info] tw-bg-teal-200 dark:tw-bg-teal-950 rounded-borders"
     >
       <q-item-section avatar>
         <q-icon name="o_info" />
@@ -72,14 +72,22 @@
         }
       "
     />
-    <q-btn color="primary" label="Set Client ID" @click="setClientID" />
 
-    <q-btn
-      color="primary"
-      label="Login"
-      @click="spotify.authenticate()"
-      :disabled="spotify.clientID === undefined"
-    />
+    <div class="tw-flex tw-flex-wrap tw-gap-4">
+      <q-btn
+        color="primary"
+        label="Set Client ID"
+        @click="setClientID"
+        class="tw-max-w-xs"
+      />
+
+      <q-btn
+        color="primary"
+        label="Login"
+        @click="spotify.authenticate()"
+        :disabled="spotify.clientID === undefined"
+      />
+    </div>
   </q-page>
 </template>
 

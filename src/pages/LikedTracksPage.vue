@@ -7,17 +7,23 @@
       :columns="columns"
       :loading="loading"
       row-key="id"
-      class="sticky-header tw-w-full tw-max-h-full"
-      table-style="max-height: 100%"
-      separator="none"
+      class="tracklist-table tw-size-full tw-relative"
+      table-style="height: 100%; scroll-margin-top: 48px"
       virtual-scroll
       hide-pagination
-      :virtual-scroll-item-size="62"
+      :virtual-scroll-item-size="64"
       :virtual-scroll-sticky-size-start="48"
       @virtual-scroll="scroll($event)"
       v-model:pagination="pagination"
       @request="request"
     >
+      <template v-slot:loading>
+        <q-linear-progress
+          indeterminate
+          class="tw-absolute tw-top-11 tw-z-10 !tw-rounded-none"
+        />
+      </template>
+
       <template v-slot:header="props">
         <q-tr :props="props">
           <q-th :props="props" key="index" class="tw-w-1"> # </q-th>
@@ -65,13 +71,22 @@
   </q-page>
 </template>
 
-<style scoped>
-:deep(.q-table) {
-  @apply tw-scroll-mt-12 tw-table-fixed;
-}
+<style>
+.tracklist-table {
+  & .q-table {
+    @apply tw-table-fixed;
+  }
+  & tr {
+    @apply tw-h-16;
+  }
+  /* Make table header sticky */
+  & thead {
+    @apply tw-sticky tw-top-0 tw-z-10 tw-bg-neutral-100 dark:tw-bg-neutral-700;
+  }
 
-.sticky-header :deep(thead) {
-  @apply tw-sticky tw-top-0 tw-z-10 tw-bg-neutral-100 tw-shadow-neutral-300 tw-shadow;
+  & tbody {
+    @apply tw-scroll-mt-12;
+  }
 }
 </style>
 

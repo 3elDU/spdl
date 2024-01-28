@@ -1,9 +1,10 @@
 <template>
   <q-item>
     <q-item-section avatar>
-      <q-avatar class="shadow-5">
-        <img :src="artist.images.at(0)?.url" />
-      </q-avatar>
+      <img
+        :src="artist.images.at(0)?.url"
+        class="tw-size-12 tw-rounded-full tw-border-solid tw-border tw-border-neutral-500"
+      />
     </q-item-section>
 
     <q-item-section>

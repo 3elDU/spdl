@@ -1,6 +1,7 @@
 <template>
   <div
     class="tw-relative tw-min-h-[80px] tw-pb-2 tw-pt-4 tw-px-4 tw-flex tw-items-center tw-gap-6"
+    :data-playing="player.loaded && !player.paused"
   >
     <audio
       ref="audio"
@@ -22,12 +23,13 @@
         snap
         :model-value="player.currentTime"
         @update:model-value="player.setTime"
-        class="!tw-rounded-none"
+        class="!tw-rounded-none player-slider"
       />
     </div>
 
     <div
-      class="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-bg-neutral-200 tw-rounded-full tw-px-4 tw-py-1 tw-z-50"
+      id="player-controls"
+      class="tw-absolute tw-left-1/2 -tw-translate-x-1/2 tw-bg-neutral-200 dark:tw-bg-neutral-700 tw-rounded-full tw-px-4 tw-py-1 tw-z-50"
     >
       <PlayerControls />
     </div>
@@ -57,12 +59,12 @@
 </template>
 
 <style>
-.q-slider__track {
-  border-radius: 0 !important;
+.player-slider .q-slider__track {
+  @apply tw-rounded-none;
 }
 
-.q-slider__inner {
-  background: lightgray !important;
+.player-slider .q-slider__inner {
+  @apply tw-bg-neutral-300/50 dark:tw-bg-neutral-600/50;
 }
 </style>
 

@@ -17,6 +17,11 @@ const page = `
         justify-content: center;
         align-items: center;
       }
+      @media (prefers-color-scheme: dark) {
+        body {
+          color: white;
+        }
+      }
     </style>
   </head>
   <body>

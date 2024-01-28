@@ -211,6 +211,7 @@ export const usePlayerStore = defineStore('player', {
     async pause() {
       this.audio?.pause();
       this.paused = true;
+      navigator.mediaSession.playbackState = 'paused';
     },
     async togglePause() {
       if (this.paused) {
@@ -218,12 +219,11 @@ export const usePlayerStore = defineStore('player', {
           await this.playTrack(this.track);
         } else {
           await this.audio?.play();
+          navigator.mediaSession.playbackState = 'playing';
         }
         this.paused = false;
       } else {
-        this.audio?.pause();
-        this.paused = true;
-        navigator.mediaSession.playbackState = 'paused';
+        await this.pause();
       }
     },
 

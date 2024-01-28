@@ -2,7 +2,7 @@
   <q-menu
     anchor="top left"
     self="bottom right"
-    class="tw-h-[50vh]"
+    class="tw-h-[50vh] dark:tw-shadow-none dark:tw-border dark:tw-border-neutral-600"
     @show="scrollToCurrentTrack"
   >
     <div class="tw-p-4 tw-flex tw-gap-2">
@@ -42,8 +42,12 @@
         </q-item-section>
 
         <q-item-section>
-          <q-item-label>{{ track.name }}</q-item-label>
-          <q-item-label caption>{{ formatTrackAuthors(track) }}</q-item-label>
+          <q-item-label>
+            <TrackTitle :track="track" />
+          </q-item-label>
+          <q-item-label caption class="tw-truncate">
+            <TrackArtists :artists="track.artists" />
+          </q-item-label>
         </q-item-section>
 
         <q-item-section side v-if="player.idx !== idx">
@@ -62,11 +66,12 @@
 
 <script setup lang="ts">
 import { usePlayerStore } from 'src/stores/player';
-import { formatTrackAuthors } from 'src/util';
 import TrackAlbumCover from 'components/track/TrackAlbumCover.vue';
 import DynamicTrackIndex from 'components/track/DynamicTrackIndex.vue';
 import { Ref, ref } from 'vue';
 import { QItem } from 'quasar';
+import TrackTitle from '../links/TrackTitle.vue';
+import TrackArtists from '../links/TrackArtists.vue';
 
 const player = usePlayerStore();
 

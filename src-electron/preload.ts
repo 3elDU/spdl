@@ -30,6 +30,8 @@ contextBridge.exposeInMainWorld('ipc', {
   chooseMusicDirectory: () =>
     ipcRenderer.invoke('preferences:chooseMusicDirectory'),
   openMusicDirectory: () => ipcRenderer.send('preferences:openMusicDirectory'),
+  setThemePreference: (theme: 'light' | 'dark' | 'system') =>
+    ipcRenderer.send('preferences:setThemePreference', theme),
 
   downloadTrack: (track: SPDL.Track, queued: boolean) => {
     ipcRenderer.send(

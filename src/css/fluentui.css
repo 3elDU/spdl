@@ -1,0 +1,70 @@
+/* Reset background */
+html,
+body,
+#q-app,
+.q-layout {
+  background: none;
+}
+
+/* Make header transparent */
+.q-header {
+  background: none;
+  color: black;
+  border-bottom-width: 0;
+}
+@media (prefers-color-scheme: dark) {
+  .q-header {
+    color: white;
+  }
+}
+
+/* Make drawer transparent */
+.q-drawer,
+.q-drawer__content {
+  background: none;
+  border-width: 0;
+}
+/* Make footer transparent */
+.q-footer {
+  background: none;
+  border-width: 0;
+}
+
+/* Disable shadow for the header */
+.q-header .q-layout__shadow {
+  display: none;
+}
+
+/* Borders on top and bottom of the page content */
+.q-page {
+  border-color: #e9e3e9;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+@media (prefers-color-scheme: dark) {
+  .q-page {
+    border-color: #404040;
+  }
+}
+
+/*
+    Round borders and add a left border to the page
+    (only when the side drawer is opened)
+  */
+.q-page[drawer-open='true'] {
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-left-width: 1px;
+}
+
+#player-controls {
+  background-color: transparent;
+}
+
+/*
+  Remove rounding of the bottom-left corner of the page, when
+  the track slider is shown, as the rounded border interferes with the slider
+*/
+.q-page-container:has(+ .q-footer .player-slider) > .q-page {
+  border-bottom-left-radius: 0;
+}

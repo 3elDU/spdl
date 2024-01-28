@@ -33,6 +33,9 @@ export interface UserPreferences {
   syncedPlaylists: SyncedPlaylist[];
   // In spotify, liked tracks are represented as a separate entity from regular playlists
   syncedLikedTracks: SyncedLikedTracks;
+  // Experimental Fluent UI design for windows
+  fluentUIMode: boolean;
+  themePreference: 'light' | 'dark' | 'system';
 }
 
 export const preferences = new Store({
@@ -61,6 +64,17 @@ export const preferences = new Store({
         },
         spotifyAppClientID: {
           type: 'string',
+        },
+        fluentUIMode: {
+          type: 'boolean',
+          description:
+            'Experimental Fluent UI design mode. Available only for windows.',
+          default: false,
+        },
+        themePreference: {
+          type: 'string',
+          enum: ['light', 'dark', 'system'],
+          default: 'system',
         },
         syncedPlaylists: {
           type: 'array',
@@ -137,6 +151,8 @@ export const preferences = new Store({
       musicDirectory: join(app.getPath('music'), 'SPDL'),
       parallelDownloadingLimit: availableParallelism(),
       previousMusicDirectories: [] as string[],
+      fluentUIMode: false,
+      themePreference: 'system',
       syncedPlaylists: [] as SyncedPlaylist[],
       syncedLikedTracks: {
         synced: false,
