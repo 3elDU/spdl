@@ -41,6 +41,8 @@
     <q-item-section side v-if="showDownloadButton && track">
       <TrackDownloadProgress show-download-button :track="track" />
     </q-item-section>
+
+    <TrackContextMenu v-if="track" :track="track" />
   </q-item>
 </template>
 
@@ -53,6 +55,7 @@ import { formatTrackDuration } from 'src/util';
 import TrackAlbum from '../links/TrackAlbum.vue';
 import TrackArtists from '../links/TrackArtists.vue';
 import TrackTitle from '../links/TrackTitle.vue';
+import TrackContextMenu from './TrackContextMenu.vue';
 
 defineProps<{
   loading?: boolean;

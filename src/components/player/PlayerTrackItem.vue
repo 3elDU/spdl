@@ -16,6 +16,8 @@
         </q-item-label>
       </q-item-section>
     </q-item>
+
+    <TrackContextMenu v-if="player.track" :track="player.track" />
   </div>
 </template>
 
@@ -24,6 +26,7 @@ import { usePlayerStore } from 'src/stores/player';
 import TrackArtists from '../links/TrackArtists.vue';
 import TrackTitle from '../links/TrackTitle.vue';
 import TrackAlbumCover from '../track/TrackAlbumCover.vue';
+import TrackContextMenu from '../track/TrackContextMenu.vue';
 
 const player = usePlayerStore();
 </script>

@@ -13,7 +13,7 @@ import { queue } from 'app/core/queue';
 import { downloadTrackQueued } from 'app/core/worker';
 import { statLibrary } from './stat/stat';
 import localSearch from './search';
-import { readFile } from 'fs/promises';
+import { readFile, rm } from 'fs/promises';
 import { SPDL } from 'app/types';
 import initAuthServer from './auth';
 import { getTrackStreamURL } from 'app/core/stream';
@@ -117,8 +117,20 @@ export default function registerIPCHandlers(window: BrowserWindow) {
       return undefined;
     }
   });
-  ipcMain.handle(
-    'library:searchLocal',
-    async (_event, query: string) => await localSearch(query)
-  );
+  ipcMain.on('library:deleteTrack', async (_event, track: SPDL.Track) => {
+    const path = calculateTrackPath(track);
+    if (existsSync(path)) {
+      await rm(path);
+    }
+  });
+  ipcMain.on('library:openTrackLocation', async (_event, track: SPDL.Track) => {
+    const path = calculateTrackPath(track);
+    if (existsSync(path)) {
+      await shell.showItemInFolder(path);
+    }
+  }),
+    ipcMain.handle(
+      'library:searchLocal',
+      async (_event, query: string) => await localSearch(query)
+    );
 }

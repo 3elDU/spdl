@@ -33,6 +33,8 @@ interface ElectronIPC {
   searchLocal(query: string): Promise<SPDL.Track[]>;
   // Returns base64-encoded .mp3 file
   loadAudioFile(track: SPDL.Track): Promise<string | undefined>;
+  deleteTrack(track: SPDL.Track): Promise<void>;
+  openTrackLocation(track: SPDL.Track): Promise<void>;
 }
 
 declare global {

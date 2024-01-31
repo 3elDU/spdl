@@ -9,6 +9,7 @@
 
     <q-table
       v-if="tracks.length !== 0"
+      class="search-results-table"
       flat
       :rows="tracks"
       :columns="columns"
@@ -44,6 +45,17 @@
     </q-table>
   </q-page>
 </template>
+
+<style>
+.search-results-table .q-table__control .q-btn:not(.disabled) {
+  /*
+    Pagination buttons look really bad with dark mode.
+    Also, quasar styles apply !important on all color classes,
+    so I also have to use !important for the styles to be applied
+  */
+  @apply dark:!tw-text-neutral-100;
+}
+</style>
 
 <script setup lang="ts">
 import { QTableColumn } from 'quasar';

@@ -56,8 +56,12 @@ contextBridge.exposeInMainWorld('ipc', {
   },
 
   statLibrary: () => ipcRenderer.invoke('library:stat'),
-  searchLocal: (query: string) =>
-    ipcRenderer.invoke('library:searchLocal', query),
   loadAudioFile: (track: SPDL.Track): Promise<string | undefined> =>
     ipcRenderer.invoke('library:loadAudioFile', track),
+  deleteTrack: (track: SPDL.Track): void =>
+    ipcRenderer.send('library:deleteTrack', track),
+  openTrackLocation: (track: SPDL.Track) =>
+    ipcRenderer.send('library:openTrackLocation', track),
+  searchLocal: (query: string) =>
+    ipcRenderer.invoke('library:searchLocal', query),
 });

@@ -12,7 +12,7 @@
     :value="queueItem.progress"
     class="tw-m-[5px]"
     size="sm"
-    track-color="grey-3"
+    color="primary"
     :title="queueItem.progress.toString() + '%'"
   />
   <q-icon
