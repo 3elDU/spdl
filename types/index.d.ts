@@ -1,5 +1,10 @@
 export declare namespace SPDL {
   export interface Track {
+    // Track's YouTube video ID can be overriden by the client.
+    // In that case, when playing/downloading the track,
+    // this ID will be used directly as the track source, instead of searching youtube,
+    // and choosing the best match.
+    video_id?: string;
     // Audio file location on disk
     src?: string;
     // Direct URL to audio file for streaming

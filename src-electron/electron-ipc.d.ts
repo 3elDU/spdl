@@ -1,6 +1,7 @@
 import LibraryStats from 'app/types/stat';
 import { UserPreferences } from './store';
 import { SPDL } from 'app/types';
+import { Video } from 'youtube-sr';
 
 interface ElectronIPC {
   minimize(): void;
@@ -22,6 +23,7 @@ interface ElectronIPC {
   setThemePreference(theme: 'light' | 'dark' | 'system'): void;
 
   downloadTrack(track: SPDL.Track, queued: boolean): void;
+  searchYT(track: SPDL.Track): Promise<Video[]>;
   getStreamingURL(track: SPDL.Track): Promise<string | undefined>;
   // Returns path to the audio file, if track exists on disk
   trackExistsOnDisk(track: SPDL.Track): Promise<string | undefined>;
@@ -31,6 +33,7 @@ interface ElectronIPC {
 
   statLibrary(): Promise<LibraryStats>;
   searchLocal(query: string): Promise<SPDL.Track[]>;
+  loadTrackMetadata(track: SPDL.Track): Promise<SPDL.Track | undefined>;
   // Returns base64-encoded .mp3 file
   loadAudioFile(track: SPDL.Track): Promise<string | undefined>;
   deleteTrack(track: SPDL.Track): Promise<void>;

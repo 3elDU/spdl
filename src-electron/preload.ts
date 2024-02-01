@@ -1,6 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron';
 import { UserPreferences } from './store';
 import { SPDL } from 'app/types';
+import { Video } from 'youtube-sr';
 
 contextBridge.exposeInMainWorld('ipc', {
   minimize: () => ipcRenderer.send('window-minimize'),
@@ -46,6 +47,10 @@ contextBridge.exposeInMainWorld('ipc', {
     return ipcRenderer.invoke('spotify:trackExistsOnDisk', track);
   },
 
+  searchYT: (track: SPDL.Track): Promise<Video[]> => {
+    return ipcRenderer.invoke('youtube:search', track);
+  },
+
   getQueueItems: (): Promise<SPDL.Queue.Item[]> => {
     return ipcRenderer.invoke('queue:get');
   },
@@ -56,6 +61,8 @@ contextBridge.exposeInMainWorld('ipc', {
   },
 
   statLibrary: () => ipcRenderer.invoke('library:stat'),
+  loadTrackMetadata: (track: SPDL.Track) =>
+    ipcRenderer.invoke('library:loadTrackMetadata', track),
   loadAudioFile: (track: SPDL.Track): Promise<string | undefined> =>
     ipcRenderer.invoke('library:loadAudioFile', track),
   deleteTrack: (track: SPDL.Track): void =>

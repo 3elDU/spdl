@@ -33,12 +33,15 @@
           <q-item-label>Download</q-item-label>
         </q-item-section>
       </q-item>
-      <q-item clickable v-close-popup disable>
+      <q-item clickable v-close-popup @click="chooseSource">
         <q-item-section avatar>
           <q-icon name="rule" />
         </q-item-section>
         <q-item-section>
-          <q-item-label>Choose source for download</q-item-label>
+          <q-item-label
+            title="Search YouTube and choose a custom source for the track"
+            >Choose source for download</q-item-label
+          >
         </q-item-section>
       </q-item>
 
@@ -89,9 +92,13 @@
 </style>
 
 <script setup lang="ts">
+import TrackSourceChooserDialog from 'components/track/dialogs/TrackSourceChooserDialog.vue';
 import { SPDL } from 'app/types';
 import { usePlayerStore } from 'src/stores/player';
 import { ref, toRaw } from 'vue';
+import { useQuasar } from 'quasar';
+
+const quasar = useQuasar();
 
 const props = defineProps<{
   track: SPDL.Track;
@@ -116,5 +123,14 @@ function deleteFromDisk() {
 
 function openTrackLocation() {
   window.ipc.openTrackLocation(toRaw(props.track));
+}
+
+function chooseSource() {
+  quasar.dialog({
+    component: TrackSourceChooserDialog,
+    componentProps: {
+      track: props.track,
+    },
+  });
 }
 </script>

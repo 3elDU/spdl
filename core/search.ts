@@ -6,10 +6,20 @@ export function assembleSearchQuery(track: SPDL.Track): string {
   return `${joinArtistNames(track.artists, ' ')} - ${track.name}`;
 }
 
-export async function searchYT(track: SPDL.Track): Promise<Video[]> {
+export async function searchYT(
+  track: SPDL.Track,
+  limit?: number
+): Promise<Video[]> {
+  // If the track has overriden the video ID, return that video immediately
+  if (track.video_id) {
+    return [
+      await YouTube.getVideo(`https://youtube.com/watch?v=${track.video_id}`),
+    ];
+  }
+
   return await YouTube.search(assembleSearchQuery(track), {
     type: 'video',
-    limit: 5,
+    limit: limit ?? 5,
   });
 }
 

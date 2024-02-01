@@ -6,7 +6,7 @@ import {
   nativeTheme,
   shell,
 } from 'electron';
-import { calculateTrackPath, downloadTrack } from 'app/core/downloader';
+import { downloadTrack } from 'app/core/downloader';
 import { preferences, UserPreferences } from './store';
 import { existsSync } from 'fs';
 import { queue } from 'app/core/queue';
@@ -17,6 +17,9 @@ import { readFile, rm } from 'fs/promises';
 import { SPDL } from 'app/types';
 import initAuthServer from './auth';
 import { getTrackStreamURL } from 'app/core/stream';
+import { searchYT } from 'app/core/search';
+import { Video } from 'youtube-sr';
+import { calculateTrackPath, loadTrackMetadata } from 'app/core/util';
 
 export default function registerIPCHandlers(window: BrowserWindow) {
   ipcMain.on('window-minimize', () => {
@@ -104,15 +107,31 @@ export default function registerIPCHandlers(window: BrowserWindow) {
     }
   );
 
+  ipcMain.handle(
+    'youtube:search',
+    async (_event, track: SPDL.Track): Promise<Video[]> => {
+      return await searchYT(track, 10);
+    }
+  );
+
   ipcMain.handle('library:stat', async () => {
     return await statLibrary(preferences.get('preferences.musicDirectory'));
   });
+  ipcMain.handle(
+    'library:loadTrackMetadata',
+    async (_event, track: SPDL.Track) => {
+      const path = calculateTrackPath(track);
+      if (path) {
+        return loadTrackMetadata(path);
+      }
+    }
+  );
   ipcMain.handle('library:loadAudioFile', async (_event, track: SPDL.Track) => {
     const path = calculateTrackPath(track);
 
     if (existsSync(path)) {
       const buf = await readFile(path);
-      return buf.toString('base64');
+      return 'data:audio/mp3;base64,' + buf.toString('base64');
     } else {
       return undefined;
     }

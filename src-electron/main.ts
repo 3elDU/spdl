@@ -1,4 +1,4 @@
-import { app, BrowserWindow, nativeTheme } from 'electron';
+import { app, BrowserWindow, nativeTheme, shell } from 'electron';
 import path from 'path';
 import os from 'os';
 import registerIPCHandlers from './ipc';
@@ -94,6 +94,12 @@ function handleWindowEvents() {
 
   mainWindow?.on('closed', () => {
     mainWindow = undefined;
+  });
+
+  // Open links with "target=_blank" in system browser
+  mainWindow?.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: 'deny' };
   });
 
   nativeTheme.on('updated', () => {

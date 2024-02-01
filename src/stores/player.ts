@@ -3,6 +3,32 @@ import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { toRaw } from 'vue';
 
+async function loadAudioSource(track: SPDL.Track): Promise<string | undefined> {
+  /*
+    The source preference goes like this:
+    - If a track exists on disk:
+      - If track on disk has overriden video_id, but ours doesn't - load track from disk
+      - If our track object has overriden video_id, but track on disk doesn't - stream the track
+      - Otherwise, load the track from disk
+    - Otherwise, stream the track
+  */
+
+  const existsOnDisk = await window.ipc.trackExistsOnDisk(toRaw(track));
+
+  if (!existsOnDisk) {
+    return await window.ipc.getStreamingURL(toRaw(track));
+  }
+
+  const trackOnDisk = await window.ipc.loadTrackMetadata(toRaw(track));
+
+  const shouldStream = track.video_id && !trackOnDisk?.video_id;
+  if (shouldStream) {
+    return await window.ipc.getStreamingURL(toRaw(track));
+  } else {
+    return await window.ipc.loadAudioFile(toRaw(track));
+  }
+}
+
 export const usePlayerStore = defineStore('player', {
   state: () => ({
     history: [] as SPDL.Track[],
@@ -52,50 +78,6 @@ export const usePlayerStore = defineStore('player', {
   },
 
   actions: {
-    // Fetch the track data and put in in the audio's `src` property
-    async _fetchTrack(track: SPDL.Track): Promise<boolean> {
-      if (!this.audio) {
-        return false;
-      }
-
-      // If track exists on disk, load it from disk
-      if (track.src || (await window.ipc.trackExistsOnDisk(toRaw(track)))) {
-        const base64 = await window.ipc.loadAudioFile(toRaw(track));
-        if (base64 === undefined) {
-          if (this.track) {
-            this.history.splice(this.idx, 1);
-          }
-          Notify.create({
-            type: 'negative',
-            message: 'Failed to load the track from disk',
-          });
-          return false;
-        }
-
-        this.audio.src = 'data:audio/mp3;base64,' + base64;
-        this.loaded = true;
-      } else {
-        // If track doesn't exist on the disk, stream it from YouTube
-
-        // Skip fetching streaming URL, if it is already set
-        if (track.stream_url === undefined) {
-          const stream_url = await window.ipc.getStreamingURL(toRaw(track));
-          if (stream_url === undefined) {
-            Notify.create({
-              type: 'negative',
-              message: 'Failed to get streaming URL for track',
-            });
-            return false;
-          }
-          track.stream_url = stream_url;
-        }
-
-        this.audio.src = track.stream_url;
-        this.loaded = true;
-      }
-
-      return true;
-    },
     _updateMediaSession(track: SPDL.Track) {
       const images: MediaImage[] = [];
       if (track.album.cover) {
@@ -124,14 +106,22 @@ export const usePlayerStore = defineStore('player', {
 
       // If currently played track ID is the same as requested track id,
       // just resume the playback
-      if (this.loaded && this.track?.id === track.id) {
+      if (this.loaded && this.track === track) {
         await this.play();
         return;
       }
 
-      if (!(await this._fetchTrack(track))) {
+      const src = await loadAudioSource(track);
+      if (!src) {
+        Notify.create({
+          type: 'negative',
+          message: 'Failed to load audio data for the track',
+        });
         return;
       }
+
+      this.audio.src = src;
+      this.loaded = true;
 
       // If the store was just loaded from localStorage, and there was currentTime set, restore it
       if (this.initialLoad && this.track?.id === track.id) {

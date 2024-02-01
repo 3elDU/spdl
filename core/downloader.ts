@@ -9,6 +9,7 @@ import { queue } from './queue';
 import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
 import { assembleSearchQuery, findClosestMatch, searchYT } from './search';
+import { calculateTrackPath } from './util';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -37,23 +38,6 @@ export async function downloadYTDLP() {
   await YTDlpWrap.downloadFromGithub(ytdlpPath, latestReleaseVersion);
   preferences.set('ytdlp_downloaded', true);
   downloading = false;
-}
-
-// Sanitizes part of the path, e.g. album name, or the author name.
-function sanitizePath(path: string): string {
-  return path
-    .replace(/[/\\:?*<>|'"]+/g, '_')
-    .replace(/\.+$/, '') // replace dots at the end
-    .trim();
-}
-
-export function calculateTrackPath(track: SPDL.Track): string {
-  return join(
-    preferences.get('preferences.musicDirectory'),
-    sanitizePath(track.artists[0].name),
-    sanitizePath(track.album.name),
-    sanitizePath(`${track.name}_${track.id}.mp3`)
-  );
 }
 
 // Downloads the track from YouTube, and embeds metadata in it automatically
@@ -187,11 +171,8 @@ async function embedMetadata(path: string, track: SPDL.Track) {
 
       mp3tag.tags.v2['TXXX'] = [
         {
-          description: 'spotify_ids',
-          text: JSON.stringify({
-            track_id: track.id,
-            album_id: track.album.id,
-          }),
+          description: 'track_obj',
+          text: JSON.stringify(track),
         },
       ];
     }
