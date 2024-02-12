@@ -3,7 +3,12 @@ import { defineStore } from 'pinia';
 import { Notify } from 'quasar';
 import { toRaw } from 'vue';
 
-async function loadAudioSource(track: SPDL.Track): Promise<string | undefined> {
+interface AudioSourceData {
+  data?: string;
+  streamed: boolean;
+}
+
+async function loadAudioSource(track: SPDL.Track): Promise<AudioSourceData> {
   /*
     The source preference goes like this:
     - If a track exists on disk:
@@ -16,16 +21,25 @@ async function loadAudioSource(track: SPDL.Track): Promise<string | undefined> {
   const existsOnDisk = await window.ipc.trackExistsOnDisk(toRaw(track));
 
   if (!existsOnDisk) {
-    return await window.ipc.getStreamingURL(toRaw(track));
+    return {
+      streamed: true,
+      data: await window.ipc.getStreamingURL(toRaw(track)),
+    };
   }
 
   const trackOnDisk = await window.ipc.loadTrackMetadata(toRaw(track));
 
   const shouldStream = track.video_id && !trackOnDisk?.video_id;
   if (shouldStream) {
-    return await window.ipc.getStreamingURL(toRaw(track));
+    return {
+      streamed: true,
+      data: await window.ipc.getStreamingURL(toRaw(track)),
+    };
   } else {
-    return await window.ipc.loadAudioFile(toRaw(track));
+    return {
+      streamed: false,
+      data: await window.ipc.loadAudioFile(toRaw(track)),
+    };
   }
 }
 
@@ -35,8 +49,13 @@ export const usePlayerStore = defineStore('player', {
     // Storing currently played track as index inside the history array
     // Thus, history can be traversed forward and backward, easily
     idx: 0,
+
     // Whether the audio data itself was loaded into the <audio> element
     loaded: false,
+    // Whether the track is currently loading
+    loading: false,
+    // Whether the track is streamed, rather than played from disk
+    streamed: false,
 
     // This variable is used to persist the currentTime for the track.
     // When the track is loaded, this variable is checked, and if it is set,
@@ -50,7 +69,7 @@ export const usePlayerStore = defineStore('player', {
     audio: undefined as HTMLAudioElement | undefined,
   }),
   persist: {
-    paths: ['history', 'idx', 'volume', 'currentTime'],
+    paths: ['history', 'idx', 'streamed', 'volume', 'currentTime'],
   },
 
   getters: {
@@ -100,9 +119,7 @@ export const usePlayerStore = defineStore('player', {
     },
 
     async playTrack(track: SPDL.Track) {
-      if (this.audio === undefined) {
-        return;
-      }
+      if (!this.audio) return;
 
       // If currently played track ID is the same as requested track id,
       // just resume the playback
@@ -111,8 +128,17 @@ export const usePlayerStore = defineStore('player', {
         return;
       }
 
+      // Pause the currently played audio when switching
+      this.audio.pause();
+
+      this.loading = true;
+      this.loaded = false;
+
+      // Add track to history, if the function was called externally
+      this.history[this.idx] = track;
+
       const src = await loadAudioSource(track);
-      if (!src) {
+      if (!src.data) {
         Notify.create({
           type: 'negative',
           message: 'Failed to load audio data for the track',
@@ -120,7 +146,8 @@ export const usePlayerStore = defineStore('player', {
         return;
       }
 
-      this.audio.src = src;
+      this.streamed = src.streamed;
+      this.audio.src = src.data;
       this.loaded = true;
 
       // If the store was just loaded from localStorage, and there was currentTime set, restore it
@@ -129,13 +156,12 @@ export const usePlayerStore = defineStore('player', {
         this.initialLoad = false;
       } else {
         this.audio.currentTime = 0;
+        this.currentTime = 0;
       }
-
-      // Add track to history, if the function was called externally
-      this.history[this.idx] = track;
 
       this._updateMediaSession(track);
       await this.play();
+      this.loading = false;
     },
     async playFromIndex(idx: number) {
       const track = this.history.at(idx);

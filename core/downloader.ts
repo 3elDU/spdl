@@ -1,5 +1,5 @@
 import { app } from 'electron';
-import { readFile, writeFile, mkdir } from 'fs/promises';
+import { readFile, writeFile, mkdir, rm } from 'fs/promises';
 import { basename, dirname, join } from 'path';
 import MP3Tag from 'mp3tag.js';
 import YTDlpWrap from 'yt-dlp-wrap';
@@ -10,6 +10,7 @@ import { joinArtistNames } from 'app/types/util';
 import { SPDL } from 'app/types';
 import { assembleSearchQuery, findClosestMatch, searchYT } from './search';
 import { calculateTrackPath } from './util';
+import { existsSync } from 'fs';
 
 function calculateYtdlpPath(): string {
   return join(
@@ -54,6 +55,11 @@ export async function downloadTrack(track: SPDL.Track): Promise<void> {
   const fullPath = calculateTrackPath(track);
   const trackPath = dirname(fullPath);
   const trackFilename = basename(fullPath);
+
+  // Delete the previous version from disk, if it exists
+  if (existsSync(fullPath)) {
+    await rm(fullPath);
+  }
 
   // Create parent directories for the track first
   await mkdir(dirname(fullPath), {

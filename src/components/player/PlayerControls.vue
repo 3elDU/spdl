@@ -25,9 +25,11 @@
         :icon="playButtonIcon"
         round
         color="primary"
-        :disabled="player.track === undefined"
+        :disabled="!player.track || player.loading"
         @click="player.togglePause()"
-      />
+      >
+        <q-spinner v-if="player.loading" color="white" size="24px" />
+      </q-btn>
       <q-btn
         icon="skip_next"
         flat
@@ -58,7 +60,9 @@ import { computed } from 'vue';
 const player = usePlayerStore();
 
 const playButtonIcon = computed(() => {
-  if (player.paused) {
+  if (player.loading) {
+    return undefined;
+  } else if (player.paused) {
     return 'play_arrow';
   } else {
     return 'pause';

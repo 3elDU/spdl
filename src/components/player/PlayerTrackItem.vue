@@ -6,7 +6,7 @@
         <q-item-label class="tw-flex tw-justify-start tw-gap-2">
           <TrackTitle :track="player.track" />
           <q-icon
-            v-if="player.track.stream_url"
+            v-if="player.streamed"
             name="o_cloud"
             title="Streamed from YouTube"
           />
