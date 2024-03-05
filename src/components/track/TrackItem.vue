@@ -2,47 +2,35 @@
   <q-item>
     <DynamicTrackIndex
       v-if="index !== undefined"
-      :loading="loading"
       :track="track"
       :index="index"
     />
 
     <q-item-section avatar v-if="showAlbumCover">
-      <q-skeleton
-        v-if="loading"
-        type="QAvatar"
-        square
-        size="40px"
-        class="tw-rounded"
-      />
-      <TrackAlbumCover v-else-if="track" :track="track" />
+      <TrackAlbumCover :track="track" />
     </q-item-section>
 
     <q-item-section>
       <q-item-label class="tw-truncate">
-        <q-skeleton v-if="loading" type="text" width="10rem" />
-        <TrackTitle v-else-if="track" :track="track" />
+        <TrackTitle :track="track" />
       </q-item-label>
       <q-item-label caption class="tw-truncate">
-        <q-skeleton v-if="loading" type="text" width="6rem" />
-        <TrackArtists v-else-if="track" :artists="track.artists" />
+        <TrackArtists :artists="track.artists" />
       </q-item-label>
     </q-item-section>
 
     <q-item-section v-if="showAlbumName">
-      <q-skeleton v-if="loading" type="text" width="10rem" />
-      <TrackAlbum v-else-if="track" :album="track.album" />
+      <TrackAlbum :album="track.album" />
     </q-item-section>
 
     <q-item-section side v-if="showDuration">
-      <q-skeleton v-if="loading" type="text" width="3rem" />
-      <div v-else-if="track">{{ formatTrackDuration(track.duration) }}</div>
+      <div>{{ formatTrackDuration(track.duration) }}</div>
     </q-item-section>
     <q-item-section side v-if="showDownloadButton && track">
       <TrackDownloadProgress show-download-button :track="track" />
     </q-item-section>
 
-    <TrackContextMenu v-if="track" :track="track" />
+    <TrackContextMenu :track="track" />
   </q-item>
 </template>
 
@@ -58,8 +46,7 @@ import TrackTitle from '../links/TrackTitle.vue';
 import TrackContextMenu from './TrackContextMenu.vue';
 
 defineProps<{
-  loading?: boolean;
-  track?: SPDL.Track;
+  track: SPDL.Track;
   index?: number;
   showAlbumCover?: boolean;
   showAlbumName?: boolean;

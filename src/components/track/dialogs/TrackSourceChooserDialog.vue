@@ -10,7 +10,7 @@
       <div class="tw-overflow-auto">
         <div
           v-if="loading"
-          class="tw-flex tw-w-full tw-h-24 tw-items-center tw-justify-center"
+          class="tw-flex tw-w-[512px] tw-h-48 tw-items-center tw-justify-center"
         >
           <q-spinner size="32px" />
         </div>
@@ -39,8 +39,8 @@
 
               <q-item-section side top>
                 <q-item-label caption class="tw-self-center">
-                  {{ video.durationFormatted }}</q-item-label
-                >
+                  {{ video.durationFormatted }}
+                </q-item-label>
                 <q-item-label>
                   <q-btn dense flat round icon="more_vert">
                     <track-source-action-menu :track="track" :video="video" />

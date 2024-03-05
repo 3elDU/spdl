@@ -21,8 +21,9 @@ import { SPDL } from 'app/types';
 import { computed, ref } from 'vue';
 import InlineTrackPlayButton from 'components/track/InlineTrackPlayButton.vue';
 import { usePlayerStore } from 'src/stores/player';
+import { storeToRefs } from 'pinia';
 
-const player = usePlayerStore();
+const { track: playerTrack, paused } = storeToRefs(usePlayerStore());
 
 const props = defineProps<{
   loading?: boolean;
@@ -37,6 +38,6 @@ const hovered = useElementHover(item);
 
 // Show a pause button when the track is already playing
 const isPlaying = computed(
-  () => player.track?.id === props.track!.id && !player.paused
+  () => playerTrack.value?.id === props.track!.id && !paused.value
 );
 </script>

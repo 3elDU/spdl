@@ -23,9 +23,11 @@ export function formatTrackDuration(duration: number): string {
   return formattedHours + formattedMinutes + ':' + formattedSeconds;
 }
 
-// Formats track's authors into a string
-// Adds commas between authors if there's multiple
-// Example output: 'Metallica, Black Sabbath, Red Hot Chilli Peppers'
+/**
+ * Formats track's authors into a string
+ * Adds commas between authors if there's multiple
+ * Example output: 'Metallica, Black Sabbath, Red Hot Chilli Peppers'
+ */
 export function formatTrackAuthors(track: SPDL.Track): string {
   const artistNames = track.artists.map((artist) => artist.name);
   return artistNames.join(', ');
@@ -35,7 +37,10 @@ export function formatDateTime(date: Date): string {
   return date.toLocaleString(navigator.language);
 }
 
-// Acceps different objects, such as spotify's Album or our SPDL.Track
+/**
+ * Acceps different objects, such as spotify's Album or our SPDL.Track
+ * @returns A release year of the object
+ */
 export function getReleaseYear(obj: {
   release_date?: string;
   release_year?: number;
@@ -49,11 +54,18 @@ export function getReleaseYear(obj: {
   }
 }
 
+/**
+ * Modifies the raw next URL property returned by the spotify API to be able to use it with
+ * \@spotify/web-api-ts-sdk library, or, to be precise, it's `makeRequest()` function
+ */
 export function transformNextURL(fullURL: string): string {
   const url = new URL(fullURL);
   return url.pathname.replace('/v1/', '') + url.search;
 }
 
+/**
+ * Utility function to collect all items from an async generator
+ */
 export async function collectGenerator<T>(
   generator: AsyncIterable<T>
 ): Promise<T[]> {
