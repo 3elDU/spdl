@@ -3,8 +3,15 @@ import { readdir, stat } from 'fs/promises';
 import { extname, join } from 'path';
 
 // Count the number of .mp3 files, and their total size in the specified directory
-export async function statLibrary(directory: string): Promise<LibraryStats> {
-  const files = await readdir(directory);
+export async function statLibrary(
+  directory: string
+): Promise<LibraryStats | undefined> {
+  let files: string[];
+  try {
+    files = await readdir(directory);
+  } catch {
+    return undefined;
+  }
   const stats: LibraryStats = { tracks: 0, sizeMB: 0 };
 
   for (const file of files) {
@@ -14,8 +21,10 @@ export async function statLibrary(directory: string): Promise<LibraryStats> {
     if (fileStat.isDirectory()) {
       // If it's a directory, recursively search the files
       const subStats = await statLibrary(filePath);
-      stats.tracks += subStats.tracks;
-      stats.sizeMB += subStats.sizeMB;
+      if (subStats) {
+        stats.tracks += subStats.tracks;
+        stats.sizeMB += subStats.sizeMB;
+      }
     } else if (extname(filePath).toLowerCase() === '.mp3') {
       stats.tracks++;
       // Size is in bytes, so divide it by 1 MiB
@@ -23,5 +32,6 @@ export async function statLibrary(directory: string): Promise<LibraryStats> {
     }
   }
 
-  return stats;
+  // return stats;
+  return undefined;
 }

@@ -1,6 +1,9 @@
 <template>
   <q-card flat bordered class="tw-relative">
-    <q-card-section v-if="stats" class="text-h4">{{
+    <q-card-section v-if="error" class="text-h4 text-red">
+      Error!
+    </q-card-section>
+    <q-card-section v-else-if="stats" class="text-h4">{{
       stats.tracks
     }}</q-card-section>
     <q-card-section v-else>
@@ -26,10 +29,17 @@ import { Ref, ref } from 'vue';
 import LibraryStats from 'app/types/stat';
 
 const stats: Ref<LibraryStats | undefined> = ref(undefined);
+const error: Ref<boolean> = ref(false);
 
 function loadLibraryStats() {
   stats.value = undefined;
-  window.ipc.statLibrary().then((value) => (stats.value = value));
+  window.ipc.statLibrary().then((value) => {
+    if (value === undefined) {
+      error.value = true;
+    } else {
+      stats.value = value;
+    }
+  });
 }
 loadLibraryStats();
 </script>

@@ -31,7 +31,7 @@ interface ElectronIPC {
   getQueueItems(): Promise<SPDL.Queue.Item[]>;
   onQueueUpdate(callback: (queue: SPDL.Queue.Item[]) => void): void;
 
-  statLibrary(): Promise<LibraryStats>;
+  statLibrary(): Promise<LibraryStats | undefined>;
   searchLocal(query: string): Promise<SPDL.Track[]>;
   loadTrackMetadata(track: SPDL.Track): Promise<SPDL.Track | undefined>;
   // Returns base64-encoded .mp3 file
