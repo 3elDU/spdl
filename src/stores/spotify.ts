@@ -126,6 +126,36 @@ export const useSpotifyAPIStore = defineStore('spotify', {
         next = page.next;
       }
     },
+
+    // A utility method to fetch all remaining items using the .next property in parallel
+    async fetchAllPaginated<Type>(
+      next: string,
+      total: number
+    ): Promise<Type[]> {
+      const urls = [];
+
+      const nextURL = new URL(next);
+
+      // Assemble an array with URLs to fetch all the items at once
+      const initialOffset = Number.parseInt(
+        nextURL.searchParams.get('offset')!
+      );
+      const limit = Number.parseInt(nextURL.searchParams.get('limit')!);
+      for (let i = initialOffset; i <= total; i += limit) {
+        nextURL.searchParams.set('offset', i.toString());
+        urls.push(nextURL.toString());
+      }
+
+      // Fetch items in parallel with Promise.all()
+      const items = await Promise.all(
+        urls.map((url) =>
+          this.api.makeRequest<Page<Type>>('GET', transformNextURL(url))
+        )
+      );
+
+      // Extract items from the wrapper Page object
+      return items.map((page) => page.items).flat();
+    },
   },
   persist: {
     paths: ['authenticated'],

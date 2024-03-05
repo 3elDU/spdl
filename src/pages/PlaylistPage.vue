@@ -2,28 +2,32 @@
   <q-page
     class="tw-w-full tw-flex tw-flex-col tw-justify-start tw-items-center"
   >
-    <BigAlbumOrPlaylistCard
-      :loading="loading"
-      type="playlist"
-      :item="playlist"
-    />
+    <q-virtual-scroll
+      class="tw-w-full tw-h-full tw-pb-8"
+      :items="tracks"
+      virtual-scroll-item-size="56"
+    >
+      <template #before>
+        <BigAlbumOrPlaylistCard
+          class="tw-mb-8"
+          :loading="loading"
+          type="playlist"
+          :item="playlist"
+        />
+      </template>
 
-    <q-list v-if="!loading" class="tw-w-full tw-p-8">
-      <q-intersection
-        v-for="(track, idx) in tracks"
-        :key="track.id"
-        class="tw-h-14"
-      >
+      <template #default="{ item, index }">
         <TrackItem
-          :track="track"
-          :index="idx"
+          class="tw-px-8 tw-h-14"
+          :track="item"
+          :index="index"
           show-album-cover
           show-album-name
           show-duration
           show-download-button
         />
-      </q-intersection>
-    </q-list>
+      </template>
+    </q-virtual-scroll>
   </q-page>
 </template>
 
@@ -34,8 +38,7 @@ import { Playlist, PlaylistedTrack, Track } from '@spotify/web-api-ts-sdk';
 import { SPDL } from 'app/types';
 import { fromSpotifyTrack } from 'app/types/convert';
 import { useSpotifyAPIStore } from 'src/stores/spotify';
-import { Ref, ref, watch } from 'vue';
-import { collectGenerator } from 'src/util';
+import { Ref, ShallowRef, ref, shallowRef, watch } from 'vue';
 
 const props = defineProps<{
   id: string;
@@ -46,31 +49,37 @@ watch(props, () => load());
 
 const loading: Ref<boolean> = ref(true);
 const playlist: Ref<Playlist | undefined> = ref(undefined);
-const tracks: Ref<SPDL.Track[]> = ref([]);
+let tracks: ShallowRef<SPDL.Track[]> = shallowRef([]);
 
 const spotify = useSpotifyAPIStore();
 async function load() {
   loading.value = true;
 
-  tracks.value = [];
-
   playlist.value = await spotify.api.playlists.getPlaylist(props.id);
-
-  loading.value = false;
-
   const _tracks = await spotify.api.playlists.getPlaylistItems(props.id);
 
-  tracks.value.push(
+  tracks.value = [
     ..._tracks.items
       .filter((item) => item.track.type === 'track')
       .map((item) => fromSpotifyTrack(item.track as Track)),
+  ];
 
-    ...(
-      await collectGenerator(spotify.fetchNext<PlaylistedTrack>(_tracks.next))
-    )
-      .filter((item) => item.track.type === 'track')
-      .map((item) => fromSpotifyTrack(item.track as Track))
-  );
+  if (_tracks.next) {
+    tracks.value = [
+      ...tracks.value,
+
+      ...(
+        await spotify.fetchAllPaginated<PlaylistedTrack>(
+          _tracks.next,
+          _tracks.total
+        )
+      )
+        .filter((item) => item.track.type === 'track')
+        .map((item) => fromSpotifyTrack(item.track as Track)),
+    ];
+  }
+
+  loading.value = false;
 }
 load();
 </script>
